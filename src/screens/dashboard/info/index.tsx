@@ -212,3 +212,70 @@ obj = 'hello';
 const n: number = obj;
 //The 'any' type is useful when you don't want to write out a long type just to convince TypeScript that a particular line of code is okay.
 */
+
+//Union Types
+//TypeScript allow us to build new types out of existing ones using a large variety of operators.
+//Combine types 1 ==> Union Type
+//It is a type form from 2 or more other types, representing values that may be any one of those types.
+//example 1:
+function combine(input1: number | string, input2: number | string)
+{
+  //this is a runtime check
+  let result;
+  if (typeof input1 === 'number' && typeof input2 === 'number') {
+   result = input1 + input2;
+  } else {
+    result = input1.toString() + input2.toString();
+  }
+    return result;
+  }
+
+  const combinedAges = combine(30, 26);
+  console.log(combinedAges);
+
+  const combinedNames = combine('Max', 'Anna');
+  console.log(combinedNames);
+
+  //example 2:
+  function printId(id: number | string) {
+    console.log('Your ID is: ' + id);
+  }
+//okay
+printId(101);
+//okay
+printId(202);
+//error
+//printId({myID: 22342});
+
+//working with Union Types
+//TS only allow an operation if it is valid for every member of the union.
+//example 3:
+function printIdA(id: number | string) {
+//console.log(id.toUpperCase()); //<== Error can't use method on string | string type
+//The solution narrow the union with code.
+if (typeof id === 'string') {
+  //In this branch, id is of type 'string'
+  console.log(id.toUpperCase());
+} else {
+  //here, id is of type 'number'
+  console.log(id);
+}
+}
+
+//example 4:
+function welcomePeople(x: string[] | string) {
+  if (Array.isArray(x)) {
+    //here: 'x' is 'string[]'
+    console.log("Hello, " + x.join(" and "))
+  } else {
+    //here: 'x' is 'string'
+    console.log("Welcome lone traveler, " + x);
+  }
+}
+//sometimes union have all the members have something in common, if it is so, you can use that property without narrowing
+//example 5:
+//return type is inferred as number[] | string
+function getFirstThree(x: number[] | string) {
+  return x.sliced(0, 3);
+}
+
