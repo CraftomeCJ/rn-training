@@ -61,6 +61,7 @@ const person: { // <==TS representation of an object type that helps TS understa
   age: number;
 } = {*/
 
+/*
 const person: { //<== explicitly set object type on here
 name: string;
 age: number;
@@ -76,6 +77,25 @@ role: [number, string]; //<==this marked a Tuple Type here
 //==> a fixed length fixed types of Array
 role: [2, 'author'],
 };
+*/
+
+// const ADMIN = 0;
+// const READ_ONLY = 1;
+// const AUTHOR = 2;
+
+//enum is one of many custom types in TS
+//Important: Often you'll see enums with all-uppercase values but that's not a "must-do". You can go with ANY value names.
+enum Role {
+  ADMIN = 'ADMIN',
+  READ_ONLY = 100,
+  AUTHOR = 200 };
+
+const person = {
+    name: 'Max',
+    age: 27,
+    hobbies: ['Sports', 'Cooking'],
+  role: Role.ADMIN
+  };
 
 // person.role.push('admin');
 // person.role[1] = 10;
@@ -93,7 +113,10 @@ for (const hobby of person.hobbies) {
   //console.log(hobby.map); //<== this I would get an error
 }
 
-
+// if check on certain condition
+if (person.role === Role.ADMIN) {
+console.log('is admin');
+}
 
 //Important: Nested Objects & Types
 /*Of course "object types" can also be created
@@ -123,3 +146,55 @@ console.log(product.tags[0]);
 // }
 // }
 //So you have an object type in an object type so to say.<==
+
+
+//Numeric enums
+//A numeric enum where 'Up' is init with '1'.
+//All the following members are auto-incremented from this point on.
+//auto-incrementing behaviour is useful for cases where we might not care about the member values themselves, but do care that each value is distinct from other values in the same enum.
+// enum Direction {
+//   UP = 1,
+//   DOWN,
+//   LEFT,
+//   RIGHT,
+// }
+
+//or without the initializer
+// enum Direction {
+//   UP = 1,
+//   DOWN,
+//   LEFT,
+//   RIGHT,
+// }
+
+
+//Using enum is simple:
+//just assess any member as a property off of the enum itself, declare types using the name of the enum:
+enum UserResponse {
+  NO = 0,
+  YES = 1,
+}
+
+function respond(recipient: string, message: UserResponse): void {
+  //...
+}
+
+respond("Princess Caroline", UserResponse.YES);
+
+//enums without initializer either need to be first, or have to come after numeric enums initializer with numeric constants or other constant enum members.
+//for example:
+// enum E {
+//   A = getSomeValue(), //<== //This is not allowed
+//   B,
+// }
+
+//String enums
+//In string enum, each member has to be constant-initialized with a string literal, or with another string enum member.
+enum Direction {
+  UP = 'UP',
+  DOWN = 'DOWN',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+}
+
+//String enums don't have auto-incrementing behaviour, they have benefit that they "serialize" well.
