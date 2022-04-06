@@ -213,12 +213,77 @@ const n: number = obj;
 //The 'any' type is useful when you don't want to write out a long type just to convince TypeScript that a particular line of code is okay.
 */
 
+//Important: Type Aliases & Object Types
+//Type aliases can be used to create own types.
+//I'm not limited to storing union types though - I can also use them to create a (possibly more) object types.
+//For example:
+type user = {
+  name: string;
+  age: number;
+};
+
+const u1: user = {
+  name: 'John',
+  age: 27,
+}; //<==this works!!
+//This allow me to avoid unnecessary repetition and manage types centrally.
+
+//For example 2:
+// function greet(
+//   user: {
+//     name: string;
+//     age: number;
+//   }) {
+//   console.log('Hi, I am '+ user.name);
+// }
+
+// function isOlder(
+//   user: {
+//     name: string;
+//     age: number;
+//   },
+//   checkAge: number
+// ) {
+//   return checkAge > user.age;
+// }
+//simplify above code to this:
+type User = {
+  name: string;
+  age: number;
+};
+
+function greet(user: User) {
+  console.log('Hi, I am '+ user.name);
+}
+
+function isOlder(user: User, checkAge: number) {
+  return checkAge > user.age;
+}
+
+//aliases are only aliases - i cannot use type aliases to create different /distinct "versions" of the same type.
+//For example:
+type UserInputSanitizedString = string;
+
+function sanitizeInput(str: string): UserInputSanitizedString {
+  return sanitize(str);
+}
+//create a sanitize input
+let userInput = sanitizeInput(getInput());
+//can still be re-assigned with a string though
+userInput = 'hello';
+
+//Type Aliases:  are just a way to give a name to a type.
+//It is useful if I want to use the same type more than once and refer to it by a single name.
+type Combinable = number | string; //<==type aliases
+
 //Union Types
 //TypeScript allow us to build new types out of existing ones using a large variety of operators.
 //Combine types 1 ==> Union Type
 //It is a type form from 2 or more other types, representing values that may be any one of those types.
 //example 1:
-function combine(input1: number | string, input2: number | string)
+function combine(
+  input1: Combinable, //<== can be replace by type aliases
+  input2: Combinable)
 {
   //this is a runtime check
   let result;
@@ -350,6 +415,14 @@ function configure(x: Options | 'auto') {
 }
 configure({ width: 100 });
 configure('auto');
+
+function sanitize(str: string): string {
+  throw new Error('Function not implemented.');
+}
+
+function getInput(): string {
+  throw new Error('Function not implemented.');
+}
 //configure('automatic'); //<== not assignable error
 
 //one more kind of literal type: boolean literals with only 2 boolean literal types 'true' | 'false'.
