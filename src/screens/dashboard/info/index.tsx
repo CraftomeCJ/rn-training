@@ -276,7 +276,7 @@ function welcomePeople(x: string[] | string) {
 //example 5:
 //return type is inferred as number[] | string
 function getFirstThree(x: number[] | string) {
-  return x.sliced(0, 3);
+  return x.slice(0, 3);
 }
 
 //Literal Types
