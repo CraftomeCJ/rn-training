@@ -279,3 +279,117 @@ function getFirstThree(x: number[] | string) {
   return x.sliced(0, 3);
 }
 
+//Literal Types
+//example 1:
+function combineA(
+  input1: number | string,
+  input2: number | string,
+  resultConversion: 'as-number' | 'as-text'
+  ){
+  //this is a runtime check
+  let result;
+  if (typeof input1 === 'number' && typeof input2 === 'number' || resultConversion === 'as-number') {
+   result = +input1 + +input2;
+  } else {
+    result = input1.toString() + input2.toString();
+  }
+  return result;
+  // if (resultConversion === 'as-number') {
+  //   return +result;
+  // } else {
+  //   return result.toString();
+  // }
+  }
+
+  const combinedAge = combineA(30, 26, 'as-number');
+  console.log(combinedAge);
+
+  const combinedStringAge = combineA('30', '26', 'as-number');
+  console.log(combinedStringAge);
+
+  const combinedName = combineA('Max', 'Anna', 'as-text');
+  console.log(combinedName);
+
+  //example 2:
+  let changingString = 'Hello World';
+  changingString = 'Ola Mundo';
+  //because `changingSting` can represent  any possible string, that is how TS describes it in the type system
+  changingString;
+
+  const constantString = 'Hello World';
+  //because `constantString` can only represent 1 possible string, it has a literal type representation
+  constantString;
+
+  //by themselves, literal types are not very useful.
+  let x: 'hello' = 'hello';
+  //OK
+  x = 'hello';
+  // ...
+  //x = 'howdy'; //<== not assignable error
+
+  //by combining literals into unions, we can create a new type that represents all the possible values of the literals.
+function printText(
+  s: string,
+  alignment: 'left' | 'right' | 'center') {
+    // ...
+}
+printText('Hello, world', 'left');
+//printText("G'day, mate", "centre"); //<== not assignable error
+
+//numeric literal types work the same
+function compare(a: string, b: string): -1 | 0 | 1 {
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+
+//combine with non-literal types
+interface Options {
+  width: number;
+}
+function configure(x: Options | 'auto') {
+  // . . .
+}
+configure({ width: 100 });
+configure('auto');
+//configure('automatic'); //<== not assignable error
+
+//one more kind of literal type: boolean literals with only 2 boolean literal types 'true' | 'false'.
+//the type boolean itself is actually just as alias for the union true | false
+
+/*
+//Literal Interface
+//When I initialize a variable with an object, TS assumes that the properties of the object might change values later.
+//for example:
+const obj = { counter: 0};
+if (someCondition) {
+  obj.counter = 1;
+}
+// TS don't assume the assignment of 1 to a field which previously had 0 is an error
+//because types are used to determine both reading and writing behavior
+*/
+/*
+//it also applies to string
+const req = {
+  url: 'https://example.com',
+  method: 'GET'
+};
+handleRequest(req.url, req.method);
+*/
+/*
+//There is 2 ways to work around this
+//Way 1: I can change the inference by adding a type assertion in either location:
+//change 1: I intend for req.method to always have literal type 'GET', preventing the possible assignment of 'GUESS' to the field after
+const req = {
+  url: 'https://example.com',
+  method: 'GET' as 'GET'
+};
+//change 2: I know for other reasons that req.method has the value 'GET'
+handleRequest(req.url, req.method as 'GET');
+*/
+/*
+//I can also use "const" to convert the entire object to be type literals
+const req = {
+  url: 'https://example.com',
+  method: 'GET'
+} as const;
+handleRequest(req.url, req.method);
+*/
