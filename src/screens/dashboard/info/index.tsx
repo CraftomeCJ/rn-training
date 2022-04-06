@@ -60,13 +60,28 @@ const person: { // <==TS representation of an object type that helps TS understa
   name: string;
   age: number;
 } = {*/
-const person = { //<== this is a better syntax
+
+const person: { //<== explicitly set object type on here
+name: string;
+age: number;
+hobbies: string[];
+role: [number, string]; //<==this marked a Tuple Type here
+} = { //<== this is a better syntax
   name: 'Max',
   age: 27,
 
   //Arrays Types
   hobbies: ['Sports', 'Cooking'],
+//Tuple Types another type of "Array"
+//==> a fixed length fixed types of Array
+role: [2, 'author'],
 };
+
+// person.role.push('admin');
+// person.role[1] = 10;
+
+//person.role =[0, 'admin', 'user']; //empty array is not allowed
+//2 element match the target tuple allow, 3 is not
 
 let favoriteActivities: string[];
 favoriteActivities = ['Sports'];
@@ -77,6 +92,7 @@ for (const hobby of person.hobbies) {
   console.log(hobby.toUpperCase());
   //console.log(hobby.map); //<== this I would get an error
 }
+
 
 
 //Important: Nested Objects & Types
