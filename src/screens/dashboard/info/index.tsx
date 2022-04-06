@@ -17,7 +17,7 @@ export default Info;
 
 // TypeScript's type system only helps you during development
 // (ie before the code gets compiled)
-function add(n1: number, n2: number) {
+function add(n1: number, n2: number, showResult: boolean, phase: string) {
   //in vanilla javascript
   //a non TS way of ensuring we can't call the function
   //it is better to fail at runtime it is better to fail here then showing incorrect output than before
@@ -30,17 +30,24 @@ function add(n1: number, n2: number) {
   // if (typeof n1 !== 'number' || typeof n2 !== 'number') {
   //   throw new Error("Incorrect input!");
   // }
-  return n1 + n2;
+  const result = n1 + n2;
+  if (showResult) {
+    console.log(phase + result);
+  } else {
+    return result;
+  }
+
 }
 
-const number1 = 5;
+const number1 = 5; //same as 5.0
 const number2  = 2.8;
+const printResult = true;
+const resultPhase = 'Result is: ';
 
-const result = add(number1, number2);
-console.log(result);
+add(number1, number2, printResult, resultPhase);
 
 // Important: Type Casing
-/* In TypeScript, you work with types like "string" or number
+/*In TypeScript, you work with types like "string" or number
 all the times.
 ==> IMPORTANT: It is lowercase "string" and "number",
 NOT "String" and "Number" etc.. <==
