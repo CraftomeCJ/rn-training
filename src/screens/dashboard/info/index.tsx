@@ -62,10 +62,21 @@ const person: { // <==TS representation of an object type that helps TS understa
 } = {*/
 const person = { //<== this is a better syntax
   name: 'Max',
-  age: 27
+  age: 27,
+
+  //Arrays Types
+  hobbies: ['Sports', 'Cooking'],
 };
 
+let favoriteActivities: string[];
+favoriteActivities = ['Sports'];
+
 console.log(person.name);
+
+for (const hobby of person.hobbies) {
+  console.log(hobby.toUpperCase());
+  //console.log(hobby.map); //<== this I would get an error
+}
 
 
 //Important: Nested Objects & Types
