@@ -66,3 +66,33 @@ const person = { //<== this is a better syntax
 };
 
 console.log(person.name);
+
+
+//Important: Nested Objects & Types
+/*Of course "object types" can also be created
+for "nested objects".
+
+Let's say I have a JS object:*/
+const product =
+{
+  id: '123',
+  price: 12.99,
+  tags: ['great-offer', 'hot-and-new'],
+  details: {
+    title: 'Red  Carpet',
+    description: 'A great carpet - almost brand-new!'
+    }
+}
+console.log(product.tags[0]);
+
+//This would be the "type" of such an object:
+// {
+//   id: string;
+//   price: number;
+//   tags: string[];
+//   details: {
+//     title: string;
+//     description: string;
+// }
+// }
+//So you have an object type in an object type so to say.<==
