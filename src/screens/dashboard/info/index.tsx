@@ -17,7 +17,8 @@ export default Info;
 
 // TypeScript's type system only helps you during development
 // (ie before the code gets compiled)
-function add(n1: number, n2: number, showResult: boolean, phase: string) {
+function add(n1: number, n2: number, showResult: boolean, phase: string) //<== after :number is special keyword fot TS
+{
   //in vanilla javascript
   //a non TS way of ensuring we can't call the function
   //it is better to fail at runtime it is better to fail here then showing incorrect output than before
@@ -52,3 +53,16 @@ all the times.
 ==> IMPORTANT: It is lowercase "string" and "number",
 NOT "String" and "Number" etc.. <==
 The core primitive types in TypeScript are all lowercase */
+
+/*
+//OBJECT TYPES
+const person: { // <==TS representation of an object type that helps TS understand the objects I am working with
+  name: string;
+  age: number;
+} = {*/
+const person = { //<== this is a better syntax
+  name: 'Max',
+  age: 27
+};
+
+console.log(person.name);
