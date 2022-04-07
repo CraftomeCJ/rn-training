@@ -15,6 +15,8 @@ const Info: React.FC = () =>
   );
 export default Info;
 
+
+
 //learn Functions
 //Function Return Types & "Void"
 function add (n1: number, n2: number): number //<== the return type of the function must match type in parentheses
@@ -29,3 +31,18 @@ function printResult(num: number) {
 }
 
 printResult(add(5, 12));
+
+
+//note Function as Types
+//Function Types are types that describe a function regarding the parameter and return value of that function
+//A function type is created with Arrow function annotation from JS
+//function types allow us to describe which type of function specifically we want to use somewhere and expect value in a parameter for created a function with some callback or like here a variables.
+let combinedValues: (a: number, b: number) => number;
+
+combinedValues = add;
+//combinedValues = printResult;
+//combinedValues = 5;
+
+console.log(combinedValues(8, 8));
+
+//let someValue: undefined;
