@@ -15,7 +15,9 @@ const Info: React.FC = () =>
   );
 export default Info;
 
-// TypeScript's type system only helps you during development
+
+
+//learn TypeScript's type system only helps you during development
 // (ie before the code gets compiled)
 function add(n1: number, n2: number, showResult: boolean, phase: string) //<== after :number is special keyword fot TS
 {
@@ -24,7 +26,7 @@ function add(n1: number, n2: number, showResult: boolean, phase: string) //<== a
   //it is better to fail at runtime it is better to fail here then showing incorrect output than before
   //a way to check the input in JS not need TS to do it
   //downside ==> sometime only can validate certain input in runtime, we check sometime can be avoid during development with TS
-  //The key difference between JS & TS ==>
+  //note The key difference between JS & TS ==>
   // JS uses "dynamic types" (resolved at runtime);
   // TS uses "static types" (set during development).
 
@@ -37,7 +39,6 @@ function add(n1: number, n2: number, showResult: boolean, phase: string) //<== a
   } else {
     return result;
   }
-
 }
 
 const number1 = 5; //same as 5.0
@@ -47,20 +48,20 @@ const resultPhase = 'Result is: ';
 
 add(number1, number2, printResult, resultPhase);
 
-// Important: Type Casing
+//important: Type Casing
 /*In TypeScript, you work with types like "string" or number
 all the times.
 ==> IMPORTANT: It is lowercase "string" and "number",
-NOT "String" and "Number" etc.. <==
+NOT pascalcase "String" and "Number" etc.. <==
 The core primitive types in TypeScript are all lowercase */
 
 /*
-//OBJECT TYPES
-const person: { // <==TS representation of an object type that helps TS understand the objects I am working with
+//note OBJECT TYPES
+const person: { // <==TS representation of an object type that helps TS understand the objects I'm working with
   name: string;
   age: number;
-} = {*/
-
+} = {
+  */
 /*
 const person: { //<== explicitly set object type on here
 name: string;
@@ -71,10 +72,10 @@ role: [number, string]; //<==this marked a Tuple Type here
   name: 'Max',
   age: 27,
 
-  //Arrays Types
-  hobbies: ['Sports', 'Cooking'],
+  //note Arrays Types
+  hobbies: ['Sports', 'Cooking'], //<==Array Types example
 //Tuple Types another type of "Array"
-//==> a fixed length fixed types of Array
+//==> a fixed length & fixed types kind of Array
 role: [2, 'author'],
 };
 */
@@ -84,7 +85,7 @@ role: [2, 'author'],
 // const AUTHOR = 2;
 
 //enum is one of many custom types in TS
-//Important: Often you'll see enums with all-uppercase values but that's not a "must-do". You can go with ANY value names.
+//important: Often you'll see enums with all-uppercase values but that's not a "must-do". You can go with ANY value names.
 enum Role {
   ADMIN = 'ADMIN',
   READ_ONLY = 100,
@@ -110,7 +111,7 @@ console.log(person.name);
 
 for (const hobby of person.hobbies) {
   console.log(hobby.toUpperCase());
-  //console.log(hobby.map); //<== this I would get an error
+  //console.log(hobby.map); //<== this would get an error
 }
 
 // if check on certain condition
@@ -118,7 +119,8 @@ if (person.role === Role.ADMIN) {
 console.log('is admin');
 }
 
-//Important: Nested Objects & Types
+
+//important: Nested Objects & Types
 /*Of course "object types" can also be created
 for "nested objects".
 
@@ -135,7 +137,7 @@ const product =
 }
 console.log(product.tags[0]);
 
-//This would be the "type" of such an object:
+//note This would be the "type" of such an object:
 // {
 //   id: string;
 //   price: number;
@@ -148,7 +150,7 @@ console.log(product.tags[0]);
 //So you have an object type in an object type so to say.<==
 
 
-//Numeric enums
+//note Numeric enums
 //A numeric enum where 'Up' is init with '1'.
 //All the following members are auto-incremented from this point on.
 //auto-incrementing behaviour is useful for cases where we might not care about the member values themselves, but do care that each value is distinct from other values in the same enum.
@@ -168,7 +170,7 @@ console.log(product.tags[0]);
 // }
 
 
-//Using enum is simple:
+//note Using enum is simple:
 //just assess any member as a property off of the enum itself, declare types using the name of the enum:
 enum UserResponse {
   NO = 0,
@@ -181,7 +183,7 @@ function respond(recipient: string, message: UserResponse): void {
 
 respond("Princess Caroline", UserResponse.YES);
 
-//enums without initializer either need to be first, or have to come after numeric enums initializer with numeric constants or other constant enum members.
+//important: enums without initializer either need to be first, or have to come after numeric enums initializer with numeric constants or other constant enum members.
 //for example:
 // enum E {
 //   A = getSomeValue(), //<== //This is not allowed
@@ -200,7 +202,7 @@ enum Direction {
 //String enums don't have auto-incrementing behaviour, they have benefit that they "serialize" well.
 
 /*
-//any Types
+//note "any" Types
 //a special type "any" that i can use whenever I don't want a particular value to cause typechecking errors.
 let obj: any = { x: 0};
 //none of the following lines of code will throw compile errors.
@@ -213,7 +215,7 @@ const n: number = obj;
 //The 'any' type is useful when you don't want to write out a long type just to convince TypeScript that a particular line of code is okay.
 */
 
-//Important: Type Aliases & Object Types
+//important: Type Aliases & Object Types
 //Type aliases can be used to create own types.
 //I'm not limited to storing union types though - I can also use them to create a (possibly more) object types.
 //For example:
@@ -259,8 +261,8 @@ function greet(user: User) {
 function isOlder(user: User, checkAge: number) {
   return checkAge > user.age;
 }
-
-//aliases are only aliases - i cannot use type aliases to create different /distinct "versions" of the same type.
+/*
+//learn aliases are only aliases - i cannot use type aliases to create different /distinct "versions" of the same type.
 //For example:
 type UserInputSanitizedString = string;
 
@@ -271,12 +273,13 @@ function sanitizeInput(str: string): UserInputSanitizedString {
 let userInput = sanitizeInput(getInput());
 //can still be re-assigned with a string though
 userInput = 'hello';
+*/
 
-//Type Aliases:  are just a way to give a name to a type.
+//note Type Aliases:  are just a way to give a name to a type.
 //It is useful if I want to use the same type more than once and refer to it by a single name.
 type Combinable = number | string; //<==type aliases
 
-//Union Types
+//learn Union Types
 //TypeScript allow us to build new types out of existing ones using a large variety of operators.
 //Combine types 1 ==> Union Type
 //It is a type form from 2 or more other types, representing values that may be any one of those types.
@@ -285,7 +288,7 @@ function combine(
   input1: Combinable, //<== can be replace by type aliases
   input2: Combinable)
 {
-  //this is a runtime check
+  //note this is a runtime check with "typeof" type guard
   let result;
   if (typeof input1 === 'number' && typeof input2 === 'number') {
    result = input1 + input2;
@@ -312,12 +315,15 @@ printId(202);
 //error
 //printId({myID: 22342});
 
-//working with Union Types
+//note working with Union Types
 //TS only allow an operation if it is valid for every member of the union.
+
 //example 3:
 function printIdA(id: number | string) {
 //console.log(id.toUpperCase()); //<== Error can't use method on string | string type
+
 //The solution narrow the union with code.
+//note check with "typeof" type guard
 if (typeof id === 'string') {
   //In this branch, id is of type 'string'
   console.log(id.toUpperCase());
@@ -328,6 +334,7 @@ if (typeof id === 'string') {
 }
 
 //example 4:
+//note use runtime check with "typeof" type guard
 function welcomePeople(x: string[] | string) {
   if (Array.isArray(x)) {
     //here: 'x' is 'string[]'
@@ -337,21 +344,22 @@ function welcomePeople(x: string[] | string) {
     console.log("Welcome lone traveler, " + x);
   }
 }
-//sometimes union have all the members have something in common, if it is so, you can use that property without narrowing
+
+//note sometimes union have all the members have something in common, if it is so, you can use that property without narrowing
 //example 5:
 //return type is inferred as number[] | string
 function getFirstThree(x: number[] | string) {
   return x.slice(0, 3);
 }
 
-//Literal Types
+//note Literal Types
 //example 1:
 function combineA(
   input1: number | string,
   input2: number | string,
   resultConversion: 'as-number' | 'as-text'
   ){
-  //this is a runtime check
+  //note this is a runtime check with "typeof" type guard
   let result;
   if (typeof input1 === 'number' && typeof input2 === 'number' || resultConversion === 'as-number') {
    result = +input1 + +input2;
@@ -385,14 +393,14 @@ function combineA(
   //because `constantString` can only represent 1 possible string, it has a literal type representation
   constantString;
 
-  //by themselves, literal types are not very useful.
+  //note by themselves, literal types are not very useful.
   let x: 'hello' = 'hello';
   //OK
   x = 'hello';
   // ...
   //x = 'howdy'; //<== not assignable error
 
-  //by combining literals into unions, we can create a new type that represents all the possible values of the literals.
+  //note by combining literals into unions, we can create a new type that represents all the possible values of the literals.
 function printText(
   s: string,
   alignment: 'left' | 'right' | 'center') {
@@ -400,6 +408,7 @@ function printText(
 }
 printText('Hello, world', 'left');
 //printText("G'day, mate", "centre"); //<== not assignable error
+/*
 
 //numeric literal types work the same
 function compare(a: string, b: string): -1 | 0 | 1 {
@@ -424,14 +433,16 @@ function getInput(): string {
   throw new Error('Function not implemented.');
 }
 //configure('automatic'); //<== not assignable error
+*/
 
-//one more kind of literal type: boolean literals with only 2 boolean literal types 'true' | 'false'.
+//note one more kind of literal type:
+//boolean literals with only 2 boolean literal types 'true' | 'false'.
 //the type boolean itself is actually just as alias for the union true | false
 
 /*
-//Literal Interface
+//note Literal Interface
 //When I initialize a variable with an object, TS assumes that the properties of the object might change values later.
-//for example:
+//example:
 const obj = { counter: 0};
 if (someCondition) {
   obj.counter = 1;
@@ -439,16 +450,18 @@ if (someCondition) {
 // TS don't assume the assignment of 1 to a field which previously had 0 is an error
 //because types are used to determine both reading and writing behavior
 */
+
 /*
-//it also applies to string
+//note it also applies to string
 const req = {
   url: 'https://example.com',
   method: 'GET'
 };
 handleRequest(req.url, req.method);
 */
+
 /*
-//There is 2 ways to work around this
+//note There is 2 ways to work around this
 //Way 1: I can change the inference by adding a type assertion in either location:
 //change 1: I intend for req.method to always have literal type 'GET', preventing the possible assignment of 'GUESS' to the field after
 const req = {
@@ -458,8 +471,9 @@ const req = {
 //change 2: I know for other reasons that req.method has the value 'GET'
 handleRequest(req.url, req.method as 'GET');
 */
+
 /*
-//I can also use "const" to convert the entire object to be type literals
+//note I can also use "const" to convert the entire object to be type literals
 const req = {
   url: 'https://example.com',
   method: 'GET'
