@@ -57,3 +57,16 @@ function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
 addAndHandle(10, 20, (result) => { //<== this's a callback function
   console.log(result);
 })
+
+//note The "unknown" Types
+let userInput: unknown; //<== we use unknown because we don't know what user going to input
+let userName: string; //<== will run into problem
+//unknown is more restrictive than "any" type
+
+userInput = 5;
+userInput = 'Max'; //no error
+//userName = userInput; //<== error
+//use an extra type check to ensure that userInput is a string
+if (typeof userInput === 'string') {
+  userName = userInput;
+} //<== no more error
