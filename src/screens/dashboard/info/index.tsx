@@ -148,7 +148,15 @@ minimal           //function name
   {
     return a < b ? a : b; //return statement with ternary operator
   }
-  console.log(minimal(5, 10)); //<== no error
+  console.log(minimal(15, 10)); //<== no error
   //console.log(minimal("10", "5")); //<== will show type error of: Argument of type "string" is not assignable to parameter of type "number"
 
-  
+  //learn Arrow Function
+  //Used very often in the real world and it can remove the boilerplate function keyword and make the code neater.
+  //also it can avoid the bind for this in normal function
+  //example:
+  const minimal2 = (a: string, b: string): string =>
+  {
+    return a < b ? a : b;
+  }
+console.log(minimal2("100", "50")); //<== no error
