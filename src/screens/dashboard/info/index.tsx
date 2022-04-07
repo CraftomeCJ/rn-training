@@ -30,7 +30,7 @@ greet           // function name
 (
   name          //<== parameter name
   : string      //<== parameter type annotation
-  ):void        //<== the return type of the function
+  ):void        //<== return type annotation
 {
   console.log("Hello, " + name.toUpperCase() + "!!");
 }
@@ -38,6 +38,39 @@ greet           // function name
 //greet(42); //<==runtime error "type" is string not number
 greet("John"); //no error
 //important even if i don't have type annotations on my parameter, TS will still check that I passed the right number of arguments.
+
+//note Return Type Annotations
+//Return type annotations appear after the parameter list
+function getFavoriteNumber(): number //<== return type annotations
+{
+  return 7;
+}
+/*like much variable type annotations, i don't need a return annotation because TS will infer(figure out) the return type based on the return statements.
+The example above don't change anything. Some codebases will explicitly specify the return type for documentation purposes, to prevent accidental changes, or just for personal preference.
+
+//learn Anonymous Functions
+/*Anonymous Functions are a little different from function declarations. When a function appears in a place where TS can determine how it's going to be called, the parameter of that function are automatically given types.*/
+//example:
+//No type annotation here,but TS can spot the bug
+const names = ["Alice", "Bob", "Eve"];
+
+/*
+//Contextual typing for function
+names.forEach(function(s) {
+  console.log(s.toUppercase()); //<== error
+});
+*/
+/*
+//Contextual typing also applies to arrow functions
+names.forEach((s) => {
+  console.log(s.toUppercase()) //<== error
+});
+*/
+/*
+even though the parameter (s) didn't have a type annotation, TS used the types of the forEach function, along with the inferred type of the array to determine the type (s) will have.
+This process is called "contextual typing"
+*/
+
 
 //note Function Return Types & "Void"
 function add (n1: number, n2: number): number //<== the colon after the parameter list show the return type of the function, we can explicitly assign a return type but  ==> must match type in parentheses
