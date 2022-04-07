@@ -18,8 +18,29 @@ export default Info;
 
 
 //learn Functions
-//Function Return Types & "Void"
-function add (n1: number, n2: number): number //<== the colon after the parameter list show the  return type of the function, we can explicitly assign a return type but  ==> must match type in parentheses
+
+/* Functions are the primary means of passing data around JS.
+TS allow me to specify the types of both the input & output values of functions.
+*/
+
+//note Parameter type Annotations
+// :string <== This is a parameter type annotations that go after the parameter name.
+function        //function keyword
+greet           // function name
+(
+  name          //<== parameter name
+  : string      //<== parameter type annotation
+  ):void        //<== the return type of the function
+{
+  console.log("Hello, " + name.toUpperCase() + "!!");
+}
+//when parameter has a type annotation, arguments to that function will be checked
+//greet(42); //<==runtime error "type" is string not number
+greet("John"); //no error
+//important even if i don't have type annotations on my parameter, TS will still check that I passed the right number of arguments.
+
+//note Function Return Types & "Void"
+function add (n1: number, n2: number): number //<== the colon after the parameter list show the return type of the function, we can explicitly assign a return type but  ==> must match type in parentheses
 {
   return n1 + n2;
 }
@@ -58,6 +79,7 @@ addAndHandle(10, 20, (result) => { //<== this's a callback function
   console.log(result);
 })
 
+/*
 //note The "unknown" Type
 let userInput: unknown; //<== we use unknown because we don't know what user going to input
 let userName: string; //<== will run into problem
@@ -70,7 +92,9 @@ userInput = 'Max'; //no error
 if (typeof userInput === 'string') {
   userName = userInput;
 } //<== no more error
+*/
 
+/*
 //note The "never" Type
 function generateError(message: string, code: number): never {
   throw { message: message, errorCode: code };
@@ -78,3 +102,4 @@ function generateError(message: string, code: number): never {
 }
 
 generateError('An error occurred!', 500);
+*/
