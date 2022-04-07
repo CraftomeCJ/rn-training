@@ -71,7 +71,6 @@ even though the parameter (s) didn't have a type annotation, TS used the types o
 This process is called "contextual typing"
 */
 
-
 //note Function Return Types & "Void"
 function add (n1: number, n2: number): number //<== the colon after the parameter list show the return type of the function, we can explicitly assign a return type but  ==> must match type in parentheses
 {
@@ -136,3 +135,20 @@ function generateError(message: string, code: number): never {
 
 generateError('An error occurred!', 500);
 */
+
+//learn Normal Functions
+//Understanding how to create a TypeScript function and what are the mandatory part of the function.
+//example:
+function          //function keyword
+minimal           //function name
+(
+  a: number,      //<== parameter name & Type
+  b: number
+  ): number       //<== parameter type annotation
+  {
+    return a < b ? a : b; //return statement with ternary operator
+  }
+  console.log(minimal(5, 10)); //<== no error
+  //console.log(minimal("10", "5")); //<== will show type error of: Argument of type "string" is not assignable to parameter of type "number"
+
+  
