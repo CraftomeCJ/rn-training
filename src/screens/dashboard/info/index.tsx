@@ -166,7 +166,7 @@ console.log(minimal2("100", "50")); //<== no error
 // function adding(a: number, b: number):number {
 //   return a + b;
 // }
-//arrow function
+//arrow function multiple expression
 const adding = (a:number, b: number): number => {
   return a + b;
 }
@@ -190,6 +190,10 @@ console.log(adding(12, 15));
 console.log(adding2(30,50));
 printOutput(add(5,7));
 
+//note Default Function parameters
+const adding1 = (a:number, b: number = 20): number => a + b;
+
+console.log(adding1(2));
 
 //learn Generic Functions
 //Define type relations between input parameters and output
