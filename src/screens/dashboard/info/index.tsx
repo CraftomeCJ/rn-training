@@ -160,3 +160,70 @@ minimal           //function name
     return a < b ? a : b;
   }
 console.log(minimal2("100", "50")); //<== no error
+
+//learn Generic Functions
+//Define type relations between input parameters and output
+//example:
+//if we want to make add function for two strings, we can create add2
+//BUT what if we want the same add function to work for both string and number?
+//we use generic function
+//example:
+//note If you're in a .tsx file you cannot just write <T>
+//Workaround: Use extends on the generic parameter to hint the compiler that it's a generic, e.g.:
+//const foo = <T extends unknown>(x: T) => x;
+
+const minimal3 = <T,>(a: T, b: T): T => {
+  return a < b ? a : b;
+}
+console.log("minimal", minimal(1234, 5678));
+console.log("minimal", minimal("6", "d"));
+
+//learn Guidelines for writing Good Generic Functions
+//writing generic functions is fun, but can easily get carried away for having too many parameters or using constraints where they aren't needed can make inference less efficient.
+//note Push Type Parameters Down
+//here are 2 ways to writing a function that appear similar:
+function firstElement1<Type>(arr: Type[]) {
+  return arr[0];
+}
+
+function firstElement2<Type extends any[]>(arr: Type) {
+  return arr[0];
+}
+
+//a: number (good)
+const a = firstElement1([1,2,3]);
+//b: string (bad)
+const b = firstElement2([1,2,3]);
+//This might seem identical at first glance, but "firstElement1" is a better written function. It inferred return type is "Type", but firstElement2 inferred return type is "any".
+//Because TS have to resolve arr[0] expression using the constraint type, rather "waiting" to resolve the element during call.
+//important When possible, use the type parameter itself rather than constraining it
+
+//note Use Fewer Type Parameters
+//another pair of similar functions (bad):
+function filter1<Type>(arr: Type[], func: (arg: Type) => boolean): Type[] {
+  return arr.filter(func);
+}
+
+function filter2<Type, Func extends (arg: Type) => boolean>(
+  arr: Type[],
+  func: Func
+  ): Type[] {
+  return arr.filter(func);
+}
+//We create a type parameter "Func" that doesn't relate two values. That is always a red flag, because it means callers wanting to specify type arguments have to manually specify an extra type argument for no reason. "Func" doesn't do anything but make the function harder to read and reason about!
+//important Always use as few type parameters as possible.
+
+//note Type Parameters Should Appear Twice
+//Sometimes we forget that function might not need to be generic:
+// //example (bad)
+// function greet<Str extends String>(s: Str) {
+//   console.log("Hello, " + s);
+// }
+//example (good)
+function greet1(s: string) {
+  console.log("Hello, " + s);
+}
+greet1("World");
+//Remember, type parameters are for relating the types of multiple values. If a type parameter is only used once in the function signature, it's not relating anything.
+//important If a type parameter only appears in one location, strongly reconsider if you actually need it.
+
