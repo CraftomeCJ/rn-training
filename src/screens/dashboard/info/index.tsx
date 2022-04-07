@@ -15,3 +15,17 @@ const Info: React.FC = () =>
   );
 export default Info;
 
+//learn Functions
+//Function Return Types & "Void"
+function add (n1: number, n2: number): number //<== the return type of the function must match type in parentheses
+{
+  return n1 + n2;
+}
+
+//any type that TS can infer(figure out) no need to write the type
+//use void when you don't have a  return statement
+function printResult(num: number) {
+  console.log('Result: ' + num);
+}
+
+printResult(add(5, 12));
