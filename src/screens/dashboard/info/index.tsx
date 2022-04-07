@@ -161,6 +161,36 @@ minimal           //function name
   }
 console.log(minimal2("100", "50")); //<== no error
 
+//example
+//original function
+// function adding(a: number, b: number):number {
+//   return a + b;
+// }
+//arrow function
+const adding = (a:number, b: number): number => {
+  return a + b;
+}
+//if only one expression you can do this:
+const adding2 = (a:number, b: number): number => a + b;
+
+//if only one parameter you can do this:
+const printOutput: (a:number | string) => void = output => console.log(output);
+
+//important If you got NO parameters, you HAVE TO use an empty pair of parentheses: () => {. . .}
+
+/*
+// note arrow function with a "if" check statement on DOM element
+const button = document.querySelector('button');
+if (button) {
+  button.addEventListener('click', event =>
+    console.log(event));
+  };
+*/
+console.log(adding(12, 15));
+console.log(adding2(30,50));
+printOutput(add(5,7));
+
+
 //learn Generic Functions
 //Define type relations between input parameters and output
 //example:
@@ -226,4 +256,3 @@ function greet1(s: string) {
 greet1("World");
 //Remember, type parameters are for relating the types of multiple values. If a type parameter is only used once in the function signature, it's not relating anything.
 //important If a type parameter only appears in one location, strongly reconsider if you actually need it.
-
