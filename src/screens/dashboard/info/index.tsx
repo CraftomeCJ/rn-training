@@ -195,6 +195,25 @@ const adding1 = (a:number, b: number = 20): number => a + b;
 
 console.log(adding1(2));
 
+//The Spread Operator {...}
+const hobbies = ['Sports', 'Cooking'];
+const userHobbies = ['Hiking'];
+
+//userHobbies.push(hobbies[0], hobbies[1]); //<== cumbersome
+//use spread operator function for arrays or objects
+userHobbies.push(...hobbies);
+console.log(hobbies);
+console.log(userHobbies);
+
+const person = {
+  name: 'John',
+  age: 30
+};
+
+const copiedPerson = { ...person};
+console.log(copiedPerson);
+
+
 //learn Generic Functions
 //Define type relations between input parameters and output
 //example:
