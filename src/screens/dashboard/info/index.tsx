@@ -19,7 +19,7 @@ export default Info;
 
 //learn Functions
 //Function Return Types & "Void"
-function add (n1: number, n2: number): number //<== the return type of the function must match type in parentheses
+function add (n1: number, n2: number): number //<== the colon after the parameter list show the  return type of the function, we can explicitly assign a return type but  ==> must match type in parentheses
 {
   return n1 + n2;
 }
@@ -44,5 +44,16 @@ combinedValues = add;
 //combinedValues = 5;
 
 console.log(combinedValues(8, 8));
-
+//undefined is a valid type in TS
 //let someValue: undefined;
+
+
+//note Functions Types & Callbacks
+function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
+  const result = n1 + n2;
+  cb(result);
+}
+
+addAndHandle(10, 20, (result) => { //<== this's a callback function
+  console.log(result);
+})
