@@ -352,7 +352,7 @@ greet1("World");
 const [hobby1, hobby2, ...remainingHobbies] = hobbies;
 console.log(hobbies, hobby1, hobby2);
 
-//Object Destructuring
+//note Object Destructuring
 //If I pass in an object as parameter to a function, I can destructure the property of the object.
 //example
 const {firstName: userName, age} = person;
@@ -364,7 +364,7 @@ const sum = ({h, i, j}: {h: number; i: number; j: number}): void => {
 
 sum({h: 10, i: 20, j: 30});
 
-//Example
+//example
 //I can use parameter destructuring to conveniently unpack objects provided as an argument into one or more local variables in the function body.
 /*
 //In JS, it looks like this:
@@ -386,3 +386,85 @@ type KLM = {k: number; l: number; m: number};
 function sum4({k, l, m}: KLM): void {
   console.log(k + l + m);
 }
+
+//note Optional Parameters "?"
+//Function in JS often take a variable number of arguments.
+//example the .toFixed() method of number takes an optional digit count:
+function g(n: number): void {
+  console.log(n.toFixed()); // 0 arguments
+  console.log(n.toFixed(3)); // 1 argument
+}
+g(5);
+//we can remodel it in TS by marking the parameter as optional with '?':
+//example
+//although the parameter is specified as type 'number', the x parameter actually have union type 'number | undefined' because unspecified parameters in JS get the value 'undefined'
+
+function g1(x?: number): void {
+  //...
+};
+g1(); //ok
+g1(10); //ok
+
+//I can also provide a parameter default value:
+
+//example function h1(x = 10 <== default value) {
+//Now in the body of p1, x will have type 'number' because any 'undefined' argument will be replaced with default value '10'
+
+//note when a parameter is optional, callers can always pass 'undefined', as tis simply simulates a 'missing' argument
+/*bug to fix later
+declare function d(x?: number): void
+//cut
+//All OK
+d();
+d(10);
+d(undefined);
+*/
+
+//example
+const print = (sentence?: string) => {
+  console.log(sentence ? sentence : "nothing to print");
+}
+print();
+print("I tell you a secret");
+
+//example Optional Chaining
+const fetchUserData = {
+  id: 'ul',
+  name: 'John',
+  job: {title: 'developer', company: 'Google'}
+};
+//console.log(fetchUserData.job && fetchUserData.job.title);
+//with TS I can use ? optional chaining operator to check if the property exists
+console.log(fetchUserData?.job?.title);
+
+//note Optional Parameters in Callbacks
+//very easy to make following mistakes when writing functions that invoke callbacks:
+//example (not good)
+// function myForEach(arr: any[], callback: (arg: any, index?: number) => void) {
+//   for (let i = 0; i < arr.length; i++) {
+//     callback(arr[i], i);
+//   }
+// }
+
+//What people usually intend when writing index? as an optional parameter is that they want both of these calls to be legal:
+myForEach([1, 2, 3], (a) => console.log(a));
+myForEach([1, 2, 3], (a, i) => console.log(a, i));
+
+//What this actually means is that callback might get invoked with one argument. In other words, the function definition says that the implementation might look like this:
+function myForEach(arr: any[], callback: (arg: any, index?: number) => void) {
+  for (let i = 0; i < arr.length; i++) {
+    //I don't feel like providing the index today
+    callback(arr[i]);
+  }
+}
+/*
+//In turn, TypeScript will enforce this meaning and issue errors that aren't really possible:
+myForEach([1, 2, 3], (a, i) => {
+  console.log(i.toFixed()) //<== error
+  //Object is possibly 'undefined'.
+});
+*/
+
+//note In JavaScript, if you call a function with more arguments than there are parameters, the extra arguments are simply ignored. TypeScript behaves the same way. Functions with fewer parameters (of the same types) can always take the place of functions with more parameters.
+
+//important when writing a function type for a callback, never write an optional parameter unless I intend to call the function without passing that argument
