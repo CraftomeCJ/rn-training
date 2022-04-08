@@ -195,7 +195,7 @@ const adding1 = (a:number, b: number = 20): number => a + b;
 
 console.log(adding1(2));
 
-//The Spread Operator {...}
+//note The Spread Operator {...}
 const hobbies = ['Sports', 'Cooking'];
 const userHobbies = ['Hiking'];
 
@@ -213,6 +213,70 @@ const person = {
 const copiedPerson = { ...person};
 console.log(copiedPerson);
 
+// learn REST Parameter ...
+//relate to spread operator {...}
+//other than using "optional" parameters or overloads to make functions that can accept a variety of argument counts, we can define functions that take an unbounded number of arguments using rest parameters
+//A rest parameter appears after all other parameters, and use the ==> ...syntax
+//example 1
+const add1 = (
+  //a: number, b: number, c: number, d: number //<== can use spread operator
+  ...numbers: number[]
+  ) => {
+//we can work it a number of way
+//for loop, .reduce method etc
+return numbers.reduce((curResult, curValue):number => {
+  return curResult + curValue;
+ }, 0);
+};
+
+const addNumbers = add1(5, 10, 2, 3.7);
+console.log(addNumbers);
+
+//example 2
+const printRest = (first: number, second: number, ...rest: number[]) => {
+  console.log('first: ', first);
+  console.log('second: ', first);
+};
+printRest(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const [x, y, ...rest] = array;
+console.log(x, y, rest);
+
+//example 3
+function multiply(n: number, ...m: number []):number[] {
+  return m.map((x) => n * x);
+}
+// 'f' get the value [10, 20, 30, 40]
+const f = multiply(10, 5, 3, 4, 8);
+console.log(f);
+//In TS, type annotation on these parameters is implicitly 'any[]' instead of 'any' and any annotation given must be 'Array<T> or T[], or Tuple type
+
+//note Rest arguments
+//we can provide variable number of arguments from an array using the spread syntax.
+//example using .push method of arrays takes any number of arguments
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+arr1.push(...arr2);
+const arr3 = [8, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+arr2.push(...arr3);
+console.log(arr1);
+console.log(arr2);
+
+//note TS does not assume that arrays are immutable, this can lead to some surprise behaviors
+//Inferred type is number[] -- "an array with zero or more number"
+//not specifically two numbers
+/*
+const args = [8,5];
+const angle = Math.atan2(...args); //<==error
+//A spread argument must either have a tuple type or be passed to a rest parameter.
+*/
+//to fix this situation depends on my code, but generally a const context is the most straightforward solution:
+//solution:
+//inferred as 2-length tuple
+const args = [8,5] as const;
+const angle = Math.atan2(...args)
+console.log(Math.floor(angle));
 
 //learn Generic Functions
 //Define type relations between input parameters and output
@@ -229,7 +293,7 @@ const minimal3 = <T,>(a: T, b: T): T => {
   return a < b ? a : b;
 }
 console.log("minimal", minimal(1234, 5678));
-console.log("minimal", minimal("6", "d"));
+//console.log("minimal", minimal("6", "d"));
 
 //learn Guidelines for writing Good Generic Functions
 //writing generic functions is fun, but can easily get carried away for having too many parameters or using constraints where they aren't needed can make inference less efficient.
@@ -279,3 +343,6 @@ function greet1(s: string) {
 greet1("World");
 //Remember, type parameters are for relating the types of multiple values. If a type parameter is only used once in the function signature, it's not relating anything.
 //important If a type parameter only appears in one location, strongly reconsider if you actually need it.
+
+//learn Rest Parameter
+//
