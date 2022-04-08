@@ -228,7 +228,6 @@ return numbers.reduce((curResult, curValue):number => {
   return curResult + curValue;
  }, 0);
 };
-
 const addNumbers = add1(5, 10, 2, 3.7);
 console.log(addNumbers);
 
@@ -238,7 +237,6 @@ const printRest = (first: number, second: number, ...rest: number[]) => {
   console.log('second: ', first);
 };
 printRest(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-
 const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const [x, y, ...rest] = array;
 console.log(x, y, rest);
@@ -334,8 +332,91 @@ function map<Input, Output>(arr: Input[], func: (arg: Input) => Output): Output[
 const parsed = map(['1', '2', '3'], (n: string) => parseInt(n, 10));
 //note that in this example, TS could infer both the type of the Input type parameter (from the given string array), as well as the Output type parameter based on the return value of the function expression (number).
 
+//note Generic fn working with constraints
+//We've written some generic functions that can work on any kind of value.
+//Sometimes we want to relate two values, but can only operate on a certain subset of values.
+//In this case, we can use a constraint to limit the kinds of types that a type parameter can accept.
+
+//Let's write a function that returns the longer of two values.
+//To do this, we need a length property that's a number.
+//We constrain the type parameter to that type by writing an extends clause:
+function longest<Type extends { length: number } > (a: Type, b: Type) {
+  return a.length >= b.length ? a : b; //<==ternary operator
+  //replaced by ternary operator
+  // if (a.length >= b.length) {
+  //   return a;
+  // } else {
+  //   return b;
+  // }
+}
+//longerArray is of type 'number[]'
+const longerArray = longest([90, 2, 30, 4, 5, 6, 7, 8, 9, 10], [4, 5, 6, 7 ,8]);
+console.log(longerArray);
+//longerString is of type 'alice' | 'bob'
+const longerString = longest('alice', 'christopher');
+console.log(longerString);
+//Error!! Numbers don't have a 'length' property.
+// const notOK = longest(10, 100); //<== error
+//Argument of type 'number' is not assignable to parameter of type '{ length: number; }'.
+//note There are a few interesting things to note example above.
+//We allowed TypeScript to infer the return type of longest.
+//Return type inference also works on generic functions.
+
+//Because we constrained Type to { length: number }, we were allowed to access the .length property of the a and b parameters.
+//Without the type constraint, we wouldn't be able to access those properties because the values might have been some other type without a length property.
+
+//The types of longerArray and longerString were inferred based on the arguments.
+//Remember, generics are all about relating two or more values with the same type!
+
+//Finally, just as we'd like, the call to longest(10, 100) is rejected because the number type doesn't have a .length property.
+
+//note Working with Constrained Values
+//Here's a common error when working with generic constraints:
+
+//example
+// function minimumLength<Type extends { length: number }>(
+//   obj: Type,
+//   minimum: number
+// ): Type {
+//   if (obj.length >= minimum) {
+//     return obj;
+//   } else {
+//     return { length: minimum }; //<==error
+// /*Type '{ length: number; }' is not assignable to type 'Type'.
+//   '{ length: number; }' is assignable to the constraint of type 'Type', but 'Type' could be instantiated with a different subtype of constraint '{ length: number; }'.
+// Type '{ length: number; }' is not assignable to type 'Type'.
+//   '{ length: number; }' is assignable to the constraint of type 'Type', but 'Type' could be instantiated with a different subtype of constraint '{ length: number; }'.*/
+//   }
+// }
+
+//learn It might look like this function is OK - Type is constrained to { length: number }, and the function either returns Type or a value matching that constraint. The problem is that the function promises to return the same kind of object as was passed in, not just some object matching the constraint. If this code were legal, you could write code that definitely wouldn't work:
+/* //won't work code
+//'arr' gets value {length: 6}
+// 'arr' gets value { length: 6 }
+const arr = minimumLength([1, 2, 3], 6);
+// and crashes here because arrays have
+// a 'slice' method, but not the returned object!
+console.log(arr.slice(0));
+*/
+
+//note Specifying Type Arguments
+//TypeScript can usually infer the intended type arguments in a generic call, but not always.
+//example, let’s say you wrote a function to combine two arrays:
+function combine<Type>(arr1: Type[], arr2: Type[]): Type[] {
+  return arr1.concat(arr2);
+}
+
+//Normally it would be an error to call this function with mismatched arrays:
+//const arr = combine([1, 2, 3], ["hello"]); //<== error
+//Type 'string' is not assignable to type 'number'.
+
+//If you intended to do this, however, you could manually specify Type:
+const arr = combine<string | number>([1, 2, 3], ["hello"]);
+
+
 //learn Guidelines for writing Good Generic Functions
 //writing generic functions is fun, but can easily get carried away for having too many parameters or using constraints where they aren't needed can make inference less efficient.
+
 //note Push Type Parameters Down
 //here are 2 ways to writing a function that appear similar:
 function firstElement1<Type>(arr: Type[]) {
