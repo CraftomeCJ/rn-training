@@ -206,7 +206,7 @@ console.log(hobbies);
 console.log(userHobbies);
 
 const person = {
-  name: 'John',
+  firstName: 'John',
   age: 30
 };
 
@@ -344,5 +344,45 @@ greet1("World");
 //Remember, type parameters are for relating the types of multiple values. If a type parameter is only used once in the function signature, it's not relating anything.
 //important If a type parameter only appears in one location, strongly reconsider if you actually need it.
 
-//learn Rest Parameter
-//
+//learn Parameter Destructuring
+//Array Destructuring
+//const hobby1 = hobbies[0];
+//const hobby2 = hobbies[1];
+//can use array destructuring allow us to shorten it
+const [hobby1, hobby2, ...remainingHobbies] = hobbies;
+console.log(hobbies, hobby1, hobby2);
+
+//Object Destructuring
+//If I pass in an object as parameter to a function, I can destructure the property of the object.
+//example
+const {firstName: userName, age} = person;
+console.log(userName, age, person);
+
+const sum = ({h, i, j}: {h: number; i: number; j: number}): void => {
+  console.log(h + i + j);
+}
+
+sum({h: 10, i: 20, j: 30});
+
+//Example
+//I can use parameter destructuring to conveniently unpack objects provided as an argument into one or more local variables in the function body.
+/*
+//In JS, it looks like this:
+function sum2({k, l, m}) {
+  console.log(k + l + m);
+}
+sum2({k: 10, l: 20, m: 30});
+*/
+
+//A type annotation for the object goes after the destructuring syntax:
+function sum3({k, l, m}: {k: number; l: number; m: number}): void {
+  console.log(k + l + m);
+}
+sum3({k: 20, l: 20, m: 60});
+
+//this can look verbose, but I can use a named type here:
+//same as prior example
+type KLM = {k: number; l: number; m: number};
+function sum4({k, l, m}: KLM): void {
+  console.log(k + l + m);
+}
