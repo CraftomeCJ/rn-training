@@ -468,3 +468,38 @@ myForEach([1, 2, 3], (a, i) => {
 //note In JavaScript, if you call a function with more arguments than there are parameters, the extra arguments are simply ignored. TypeScript behaves the same way. Functions with fewer parameters (of the same types) can always take the place of functions with more parameters.
 
 //important when writing a function type for a callback, never write an optional parameter unless I intend to call the function without passing that argument
+
+//note Call Signatures
+//Add extra property to the function
+//example
+type DescribableFunction = {
+  description: string;
+  (someArg: number): boolean;
+};
+
+const myDescFn: DescribableFunction = (someArg: number) =>
+someArg > 10;
+myDescFn.description = "This is a DescribableFunction to check if number is larger than 10";
+
+function doSomething(fn: DescribableFunction) {
+  console.log(fn.description + " returned " + fn(10));
+}
+
+doSomething(myDescFn);
+
+//note the syntax is slightly different compared to a function type expression - use : between the parameter list and the return type rather than =>.
+
+//Construction Signatures
+//JavaScript functions can also be invoked with the new operator. TypeScript refers to these as constructors because they usually create a new object. You can write a construct signature by adding the new keyword in front of a call signature:
+type SomeConstructor = {
+  new (s: string): SomeObject;
+};
+function fn(ctor: SomeConstructor) {
+  return new ctor("hello");
+}
+
+//Some objects, like JavaScript's Date object, can be called with or without new. You can combine call and construct signatures in the same type arbitrarily:
+interface CallOrConstruct {
+  new (s: string): Date;
+  (n?: number): number;
+}
