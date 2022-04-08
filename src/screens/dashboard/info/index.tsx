@@ -589,6 +589,99 @@ myForEach([1, 2, 3], (a, i) => {
 
 //important when writing a function type for a callback, never write an optional parameter unless I intend to call the function without passing that argument
 
+//learn Function Overloads
+//Some JavaScript functions can be called in a variety of argument counts and types.
+//For example, you might write a function to produce a Date that takes either a timestamp (one argument) or a month/day/year specification (three arguments).
+
+//In TypeScript, we can specify a function that can be called in different ways by writing overload signatures.
+//To do this, write some number of function signatures (usually two or more), followed by the body of the function:
+function makeDate(timestamp: number): Date;
+function makeDate(month: number, day: number, year: number): Date;
+function makeDate(moreTimestamp: number, day?: number, year?: number): Date {
+  //ternary operator
+  // day !== undefined && year !== undefined ? new Date(year, moreTimestamp, day) : new Date(moreTimestamp);
+  //replace by ternary operator
+  if (day !== undefined && year !== undefined) {
+    return new Date(year, moreTimestamp, day);
+  } else {
+    return new Date(moreTimestamp);
+  }
+}
+const d1 = makeDate(12345678);
+const d2 = makeDate(5, 5, 5);
+//const d3 = makeDate(1, 3); //<== error
+//No overload expects 2 arguments, but overloads do exist that expect either 1 or 3 arguments.
+console.log(d1);
+console.log(d2);
+//In above example, we wrote two overloads: one accepting one argument, and another accepting three arguments.
+//These first two signatures are called the "overload signatures".
+
+//Then, we wrote a function implementation with a compatible signature.
+//Functions have an implementation signature, but this signature can't be called directly.
+//Even though we wrote a function with two optional parameters after the required one, it can't be called with two parameters!
+
+//Learn Overload Signatures and the Implementation Signature
+//This is a common source of confusion. Often people will write code like this and not understand why there is an error:
+function fn1(x: string): void;
+function fn1() {
+  // ...
+}
+// Expected to be able to call with zero arguments
+//fn1(); //<== error
+//Expected 1 arguments, but got 0.
+//the signature used to write the function body can't be "seen" from the outside
+
+//important.The signature of the implementation is not visible from the outside. When writing an overloaded function, you should always have two or more signatures above the implementation of the function
+/*
+//The implementation signature must also be compatible with the overload signatures.
+//For example, these functions have errors because the implementation signature doesn't match the overloads in a correct way:
+function fn2(x: boolean): void;
+// Argument type isn't right
+function fn2(x: string): void; //<== error
+// This overload signature is not compatible with its implementation signature.
+function fn2(x: boolean) {}
+*/
+/*
+function fn3(x: string): string;
+// Return type isn't right
+function fn3(x: number): boolean; //<== error
+// This overload signature is not compatible with its implementation signature.
+function fn3(x: string | number) {
+  return "oops";
+}
+*/
+
+//learn Writing Good Overloads
+//Like generics, there are a few guidelines you should follow when using function overloads.
+//Following these principles will make your function easier to call, easier to understand, and easier to implement.
+
+//Let's consider a function that returns the length of a string or an array:
+//example
+function len(s: string): number;
+function len(arr: any[]): number;
+function len(x: any) {
+  return x.length;
+}
+//This function is fine; we can invoke it with strings or arrays. However, we can't invoke it with a value that might be a string or an array, because TypeScript can only resolve a function call to a single overload:
+len(""); // OK
+len([0]); // OK
+//len(Math.random() > 0.5 ? "hello" : [0]); //<==error
+// No overload matches this call.
+//   Overload 1 of 2, '(s: string): number', gave the following error.
+//     Argument of type 'number[] | "hello"' is not assignable to parameter of type 'string'.
+//       Type 'number[]' is not assignable to type 'string'.
+//   Overload 2 of 2, '(arr: any[]): number', gave the following error.
+//     Argument of type 'number[] | "hello"' is not assignable to parameter of type 'any[]'.
+//       Type 'string' is not assignable to type 'any[]'.
+
+//Because both overloads have the same argument count and same return type, we can instead write a non-overloaded version of the function with union type:
+function len1(x: any[] | string):number {
+  return x.length;
+}
+//Callers can invoke this with either sort of value, and as an added bonus, we don't have to figure out a correct implementation signature.
+//important Always prefer parameters with union types instead of overloads when possible
+
+
 //note Call Signatures
 //Add extra property to the function
 //example
