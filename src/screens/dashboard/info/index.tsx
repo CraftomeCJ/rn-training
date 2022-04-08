@@ -830,7 +830,7 @@ function fn5(x: string | number) {
   }
 }
 
-learn Global Type Function
+//learn Global Type Function
 //The global type Function describes properties like bind, call, apply, and others present on all function values in JavaScript.
 //It also has the special property that values of type Function can always be called; these calls return any:
 
@@ -839,3 +839,52 @@ function doSomething1(f: Function) {
 }
 //This is an untyped function call and is generally best avoided because of the unsafe any return type.
 //If you need to accept an arbitrary function but don't intend to call it, the type () => void is generally safer.
+
+// learn Assignability of Functions
+//Return type "void"
+
+//The "void" return type for functions can produce some unusual, but expected behavior.
+
+//Contextual typing with a return type of void does not force functions to not return something.
+
+//Another way to say this is a contextual function type with a void return type (type vf = () => void), when implemented, can return any other value, but it will be ignored.
+
+//Thus, the following implementations of the type () => void are valid:
+type voidFunc = () => void;
+
+const f6: voidFunc = () => {
+  return true;
+};
+
+const f7: voidFunc = () => true;
+
+const f8: voidFunc = function () {
+  return true;
+};
+
+//And when the return value of one of these functions is assigned to another variable, it will retain the type of void:
+
+const v1 = f6();
+
+const v2 = f7();
+
+const v3 = f8();
+
+//This behavior exists so that the following code is valid even though Array.prototype.push returns a number and the Array.prototype.forEach method expects a function with a return type of void.
+
+const src = [1, 2, 3];
+const dst = [0];
+
+src.forEach((el) => dst.push(el));
+
+//There is one other special case to be aware of, when a literal function definition has a void return type, that function must not return anything.
+
+function f2(): void {
+  // @ts-expect-error
+  return true;
+}
+
+const f3 = function (): void {
+  // @ts-expect-error
+  return true;
+};
