@@ -278,6 +278,7 @@ const args = [8,5] as const;
 const angle = Math.atan2(...args)
 console.log(Math.floor(angle));
 
+
 //learn Generic Functions
 //Define type relations between input parameters and output
 //example:
@@ -294,6 +295,44 @@ const minimal3 = <T,>(a: T, b: T): T => {
 }
 console.log("minimal", minimal(1234, 5678));
 //console.log("minimal", minimal("6", "d"));
+
+//It's common to write a function where the types of the input relate to the type of the output,
+//or where the types of two inputs are related in some way. /Let's consider for a moment a function that returns the first element of an array:
+function firstElement(arr: any[]) {
+return arr[0];
+}
+
+//This function does its job, but unfortunately has the return type any.
+//It'd be better if the function returned the type of the array element.
+
+//In TypeScript, generics are used when we want to describe a correspondence between two values.
+//We do this by declaring a type parameter in the function signature:
+function firstElement0<Type>(arr: Type[]): Type | undefined {
+  return arr[0];
+}
+
+//By adding a type parameter "Type" to this function and using it in two places, we've created a link between the input of the function (the array) and the output (the return value).
+//Now when we call it, a more specific type comes out:
+//s is of type 'string'
+const s = firstElement0(['a', 'b', 'c']);
+//n is of type 'number'
+const n = firstElement0([1, 2, 3]);
+//u is of type 'undefined'
+const u = firstElement0([]);
+
+//note Generic fn working with inference
+//we didn't have to specify 'Type' in this sample.
+//The type was inferred - chosen automatically - by TypeScript.
+
+//We can use multiple type parameters as well.
+//example, a standalone version of map would look like this:
+function map<Input, Output>(arr: Input[], func: (arg: Input) => Output): Output[] {
+  return arr.map(func);
+}
+//Parameter 'n' is of type 'string'
+//'parsed' is of type 'number[]'
+const parsed = map(['1', '2', '3'], (n: string) => parseInt(n, 10));
+//note that in this example, TS could infer both the type of the Input type parameter (from the given string array), as well as the Output type parameter based on the return value of the function expression (number).
 
 //learn Guidelines for writing Good Generic Functions
 //writing generic functions is fun, but can easily get carried away for having too many parameters or using constraints where they aren't needed can make inference less efficient.
