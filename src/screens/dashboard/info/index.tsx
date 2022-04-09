@@ -195,3 +195,46 @@ console.log(who.name, who.age);
 console.log(`${who.name}, ${who.age}` + " is assigned to here.");
 
 
+//note Methods can aka functions
+//A function property on a class is called a method. Methods can use all the same type annotations as functions and constructors:
+//example
+class Methods {
+  x = 10;
+  y = 10;
+
+  scale(n: number): void {
+    this.x *= n;
+    this.y *= n;
+  }
+}
+//Other than the standard type annotations, TypeScript doesn't add anything else new to methods.
+
+//note that inside a method body, it is still mandatory to access fields and other methods via this.. An unqualified name in a method body will always refer to something in the enclosing scope:
+//example
+/*
+let x: number = 0;
+class C {
+  x: string = "hello";
+
+  m() {
+    // This is trying to modify 'x' from line 1, not the class property
+    x = "world"; //<== error
+//Type 'string' is not assignable to type 'number'.
+  }
+}
+*/
+
+//Learn Method And create instance
+class Method {
+  x: number = 10; // "=" with value => initialize field
+  y: number = 10;
+
+  scale(n: number): void {
+    this.x *= n;
+    this.y *= n;
+  }
+}
+
+const style = new Method();
+style.scale(20); //<== default values
+console.log(style.x, style.y);
