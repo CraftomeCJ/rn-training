@@ -55,8 +55,8 @@ export default Info;
 //A field declaration creates a public writeable property on a class:
 {     //<== class body
   //<===== class field =====>
-x: number; //<== field declaration with type annotation
-y: number; //<== field declaration
+x: number; //<== property declaration with type annotation
+y: number; //<== property aka variable in a class
 
 ////Constructors can aka functions
 //Class constructors are very similar to functions. You can add parameters with type annotations, default values, and overloads:
@@ -195,7 +195,7 @@ console.log(who.name, who.age);
 console.log(`${who.name}, ${who.age}` + " is assigned to here.");
 
 
-//note Methods can aka functions
+//note Methods aka functions in a class
 //A function property on a class is called a method. Methods can use all the same type annotations as functions and constructors:
 //example
 class Methods {
@@ -224,7 +224,7 @@ class C {
 }
 */
 
-//Learn Method And create instance
+//learn Method And create instance
 class Method {
   x: number = 10; // "=" with value => initialize field
   y: number = 10;
@@ -240,7 +240,7 @@ style.scale(20); //<== default values
 console.log(style.x, style.y);
 
 
-//Learn Getters/Setters
+//learn Getters/Setters
 //Classes can also have accessors:
 //example
 class GetterSetter {
@@ -289,3 +289,78 @@ class MyClass {
     return this[s] as boolean;
   }
 }
+
+
+//note Class Heritage
+//Like other languages with object-oriented features, classes in JavaScript can inherit from base classes.
+
+////implements Clauses
+//You can use an implements clause to check that a class satisfies a particular interface. An error will be issued if a class fails to correctly implement it:
+
+/*
+interface Pingable {
+  ping(): void;
+}
+
+class Sonar implements Pingable {
+  ping() {
+    console.log("ping!");
+  }
+}
+
+class Ball implements Pingable { // <== error
+//Class 'Ball' incorrectly implements interface 'Pingable'.
+  //Property 'ping' is missing in type 'Ball' but required in type 'Pingable'.
+
+  pong() {
+    console.log("pong!");
+  }
+}
+*/
+//Classes may also implement multiple interfaces, e.g. class C implements A, B {.
+
+////Cautions
+//important It's important to understand that an implements clause is only a check that the class can be treated as the interface type. It doesn't change the type of the class or its methods at all. A common source of error is to assume that an implements clause will change the class type - it doesn't!
+//example
+/*
+interface Checkable {
+  check(name: string): boolean;
+}
+class NameChecker implements Checkable {
+  check(s) { //<== error
+//Parameter 's' implicitly has an 'any' type.
+    // Notice no error here
+    return s.toLowercse() === "ok";
+  }
+}
+*/
+//In above example, we perhaps expected that (s)'s type would be influenced by the name: string parameter of check. It is not - implements clauses don't change how the class body is checked or its type inferred.
+
+//Similarly, implementing an interface with an optional property doesn't create that property:
+//example
+/*
+interface A {
+  x: number;
+  y?: number;
+}
+class C implements A {
+  x = 0;
+}
+const c = new C();
+c.y = 10; // <== error
+//Property 'y' does not exist on type 'C'.
+*/
+
+//learn Class can implement interface
+interface Pingable {
+  ping(): void;
+}
+
+class Sonar implements Pingable {
+  ping() {
+    console.log("ping!");
+  }
+}
+
+const sonar = new Sonar();
+sonar.ping();
