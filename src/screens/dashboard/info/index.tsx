@@ -16,4 +16,5 @@ const Info: React.FC = () =>
 export default Info;
 
 
+//learn Object Types - Classes
 
