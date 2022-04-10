@@ -448,3 +448,111 @@ const b: Base = new Derived();
 // Crashes because "name" will be undefined
 b.greet();
 */
+
+//note Type-only Field Declarations
+//When target >= ES2022 or useDefineForClassFields is true, class fields are initialized after the parent class constructor completes, overwriting any value set by the parent class.
+//This can be a problem when you only want to re-declare a more accurate type for an inherited field.
+//To handle these cases, you can write declare to indicate to TypeScript that there should be no runtime effect for this field declaration.
+//example
+/*
+interface Animal {  //<== can be use as : type
+  dateOfBirth: any;
+}
+
+interface Dog extends Animal {
+  breed: any;
+}
+
+class AnimalHouse {
+  resident: Animal;
+
+  constructor(animal: Animal) {
+    //use this. syntax to call class property assign to constructor's parameter name
+    this.resident = animal;
+  }
+}
+
+class DogHouse extends AnimalHouse {
+  //does not emit JS code,
+  //only ensures the types are correct
+  declare resident: Dog;
+
+  constructor(dog: Dog) {
+    super(dog);
+  }
+}
+*/
+
+//note Initialization Order
+//The order that JavaScript classes initialize can be surprising in some cases. Let's consider this code:
+class initialOrderBase {
+  name = "base";
+
+  constructor() {
+    console.log("My name is " + this.name);
+  }
+}
+
+class Derived extends initialOrderBase {
+  name = "derived";
+}
+
+//prints "base", not "derived"
+const d = new Derived();
+/*
+What happened here?
+
+The order of class initialization, as defined by JavaScript, is:
+
+1. The base class fields are initialized
+2. The base class constructor runs
+3. The derived class fields are initialized
+4. The derived class constructor runs
+
+This means that the base class constructor saw its own value for name during its own constructor, because the derived class field initializations hadn't run yet.
+*/
+
+//note Inheriting Built-in Types
+
+//note: If you don't plan to inherit from built-in types like Array, Error, Map, etc. or your compilation target is explicitly set to ES6/ES2015 or above, you may skip this section
+
+//In ES2015, constructors which return an object implicitly substitute the value of this for any callers of super(...). It is necessary for generated constructor code to capture any potential return value of super(...) and replace it with this.
+
+//As a result, subclassing Error, Array, and others may no longer work as expected. This is due to the fact that constructor functions for Error, Array, and the like use ECMAScript 6's new.target to adjust the prototype chain; however, there is no way to ensure a value for new.target when invoking a constructor in ECMAScript 5. Other downlevel compilers generally have the same limitation by default.
+
+//example For a subclass like the following:
+/*
+class MsgError extends Error {
+  constructor(m: string) {
+    super(m);
+  }
+  sayHello() {
+    return "hello " + this.message;
+  }
+}
+*/
+
+// you may find that:
+
+//methods may be undefined on objects returned by constructing these subclasses, so calling sayHello will result in an error.
+
+//instanceof will be broken between instances of the subclass and their instances, so (new MsgError()) instanceof MsgError will return false.
+
+//As a recommendation, you can manually adjust the prototype immediately after any super(...) calls.
+//example
+class MsgError extends Error {
+  constructor(m: string) {
+    super(m);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, MsgError.prototype);
+  }
+
+  sayHello() {
+    return "hello " + this.message;
+  }
+}
+//However, any subclass of MsgError will have to manually set the prototype as well. For runtime that don't support Object.setPrototypeOf, you may instead be able to use __proto__.
+
+//Unfortunately, these workarounds will not work on Internet Explorer 10 and prior. One can manually copy methods from the prototype onto the instance itself (i.e. MsgError.prototype onto this), but the prototype chain itself cannot be fixed.
+
