@@ -294,7 +294,7 @@ class MyClass {
 //note Class Heritage
 //Like other languages with object-oriented features, classes in JavaScript can inherit from base classes.
 
-////implements Clauses
+//learn implements Clauses
 //You can use an implements clause to check that a class satisfies a particular interface. An error will be issued if a class fails to correctly implement it:
 
 /*
@@ -364,3 +364,87 @@ class Sonar implements Pingable {
 
 const sonar = new Sonar();
 sonar.ping();
+
+
+//learn extends Clauses
+//Class can extend base class
+//Classes may extend from a base class. A derived class called "sub-class" has all the properties and methods of its base class, and also define additional members.
+//example
+class Animal {
+  move() {
+    console.log("roaming the earth...");
+  }
+}
+
+class Dog extends Animal {
+  bark(times: number) {
+    for (let i = 0; i < times; i++) {
+      console.log("Woof!");
+    }
+  }
+}
+
+const dog = new Dog();
+//Base class method
+dog.move();
+//Sub class method
+dog.bark(3);
+
+
+//learn Overriding Methods
+//A sub class can also override a base class field or property. You can use the "super." syntax to access base class methods.
+
+//note that because JavaScript classes are a simple lookup object, there is no notion of a "super field".
+
+//TypeScript enforces that a derived class is always a subtype of its base class.
+
+//example, here's a legal way to override a method:
+class Base {
+  greet() {
+    console.log("Hello there!!");
+  }
+}
+
+class subClass extends Base {
+  greet(name?: string) {
+    // if (name === undefined) {
+    //   super.greet();
+    // }else {
+    //   console.log(`Hello, + ${name.toUpperCase()}`);
+    // }
+    //rewrite with ternary operator
+    (name === undefined) ? super.greet() : console.log (`Hello, + ${name.toUpperCase()}`);
+  }
+}
+
+const human = new subClass();
+human.greet();
+human.greet("Bobby");
+
+//important It's important that a derived (sub)class follow its base class contract. Remember that it's very common (and always legal!) to refer to a derived class instance through a base class reference:
+//Alias the derived subclass instance through a base class reference
+const derived: Base = human;
+//No problem
+derived.greet();
+
+////what if Derived didn't follow Base's contract?
+//example
+/*
+class notFollowBase {
+  greet() {
+    console.log("Hello there!!");
+  }
+}
+class Derived extends notFollowBase {
+  //Make this parameter required
+  greet(name: string) {   //<== error
+   //Property 'greet' in type 'Derived' is not assignable to the same property in base type 'Base'.
+  //Type '(name: string) => void' is not assignable to type '() => void'.
+  console.log(`Hello, ${name.toUpperCase()}`);
+}
+}
+//If we compiled this code despite the error, this sample would then crash:
+const b: Base = new Derived();
+// Crashes because "name" will be undefined
+b.greet();
+*/
