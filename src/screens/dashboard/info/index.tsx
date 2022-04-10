@@ -942,3 +942,283 @@ console.log(g());
 // Only one function per class definition gets allocated, rather than one per class instance
 //Base method definitions can still be called via super.
 
+
+//learn this Types
+//In classes, a special type called this refers dynamically to the type of the current class. Let's see how this is useful:
+class ThisBox {
+  contents: string = "";
+  set(value: string) {
+
+    this.contents = value;
+    return this;
+  }
+}
+
+//Here, TypeScript inferred the return type of set to be this, rather than Box.
+//Now let's make a subclass of Box:
+class ClearableBox extends ThisBox {
+  clear() {
+    this.contents = "";
+  }
+}
+
+const a5 = new ClearableBox();
+const b5 = a5.set("hello, there");
+
+//You can also use this in a parameter type annotation:
+class AnotherBox {
+  content: string = "";
+
+  sameAs(other: this) {
+    return other.content === this.content;
+  }
+}
+
+//This is different from writing other: Box — if you have a derived class, its sameAs method will now only accept other instances of that same derived class:
+class OtherBox {
+  content: string = "";
+
+  sameAs(other: this) {
+    return other.content === this.content;
+  }
+}
+
+class DerivedBox extends OtherBox {
+  otherContent: string = "?";
+}
+
+const baseOther = new OtherBox();
+const derivedOther = new DerivedBox();
+derivedOther.sameAs(baseOther); //<== error
+//Argument of type 'Box' is not assignable to parameter of type 'DerivedBox'.
+  //Property 'otherContent' is missing in type 'Box' but required in type 'DerivedBox'.
+
+  //note this-based type guards
+
+//You can use this is Type in the return position for methods in classes and interfaces.
+//When mixed with a type narrowing (e.g. if statements) the type of the target object would be narrowed to the specified Type.
+//example
+/*
+class FileSystemObject {
+  isFile(): this is FileRep {
+    return this instanceof FileRep;
+  }
+  isDirectory(): this is Directory {
+    return this instanceof Directory;
+  }
+  isNetworked(): this is Networked & this {
+    return this.networked;
+  }
+
+  constructor(public path: string, private networked: boolean) {}
+}
+
+class FileRep extends FileSystemObject {
+  constructor(path: string, public content: string) {
+    super(path, false);
+  }
+}
+
+class Directory extends FileSystemObject {
+  children: FileSystemObject[];
+}
+
+interface Networked {
+  host: string;
+}
+
+const fso: FileSystemObject = new FileRep("foo/bar.txt", "foo");
+
+if (fso.isFile()) {
+  fso.content;
+
+const fso: FileRep
+} else if (fso.isDirectory()) {
+  fso.children;
+
+const fso: Directory
+} else if (fso.isNetworked()) {
+  fso.host;
+
+const fso: Networked & FileSystemObject
+}
+*/
+
+//important A common use-case for a this-based type guard is to allow for lazy validation of a particular field.
+//example, this case removes an undefined from the value held inside box when hasValue has been verified to be true:
+class LazyValidationBox<T> {
+  value?: T;
+
+  hasValue(): this is { value: T } {
+    return this.value !== undefined;
+  }
+}
+
+const box = new LazyValidationBox();
+box.value = "Gameboy";
+
+box.value;
+//(property) LazyValidationBox<unknown>.value?: unknown <==
+
+if (box.hasValue()) {
+  box.value;
+//(property) value: unknown
+}
+
+//note Parameter Properties
+//TypeScript offers special syntax for turning a constructor parameter into a class property with the same name and value.
+//These are called parameter properties and are created by prefixing a constructor argument with one of the visibility modifiers public, private, protected, or readonly.
+//The resulting field gets those modifier(s):
+/*
+class Params {
+  constructor(
+    public readonly x: number,
+    protected y: number,
+    private z: number
+  ) {
+    // No body necessary
+  }
+}
+const a = new Params(1, 2, 3);
+console.log(a.x);
+//(property) Params.x: number
+
+console.log(a.z); //<== error
+//Property 'z' is private and only accessible within class 'Params'.
+*/
+
+//note Class Expressions
+//Class expressions are very similar to class declarations. The only real difference is that class expressions don't need a name, though we can refer to them via whatever identifier they ended up bound to:
+const someClass = class<Type> {
+  content: Type;
+
+  constructor(value: Type) {
+    this.content = value;
+  }
+};
+
+const m = new someClass("Hello, world");
+//const m: someClass<string>
+
+//note abstract Classes and Members
+//Classes, methods, and fields in TypeScript may be abstract.
+
+//An abstract method or abstract field is one that hasn't had an implementation provided. These members must exist inside an abstract class, which cannot be directly instantiated.
+
+//The role of abstract classes is to serve as a base class for subclasses which do implement all the abstract members. When a class doesn’t have any abstract members, it is said to be concrete.
+
+//example:
+
+abstract class AbstractBase {
+  abstract getName(): string;
+
+  printName() {
+    console.log("Hello, " + this.getName());
+  }
+}
+
+//const b6 = new AbstractBase(); //<== error
+//Cannot create an instance of an abstract class.
+
+//We can't instantiate Base with new because it's abstract. Instead, we need to make a derived class and implement the abstract members:
+class AbstractDerived extends AbstractBase {
+  getName() {
+    return "world";
+  }
+}
+
+const d6 = new AbstractDerived();
+d6.printName();
+
+//Notice that if we forget to implement the base class's abstract members, we'll get an error:
+//example with error
+/*
+class AbstractDerived1 extends AbstractBase {
+  //Non-abstract class 'Derived' does not implement inherited abstract member 'getName' from class 'Base'.
+
+    // forgot to do anything
+  }
+*/
+
+//note Abstract Construct Signatures
+
+//Sometimes you want to accept some class constructor function that produces an instance of a class which derives from some abstract class.
+/*
+//example, you might want to write this code:
+function greet(ctor: typeof AbstractBase) {
+  const instance = new ctor(); //<== error
+//Cannot create an instance of an abstract class.
+
+  instance.printName();
+}
+*/
+
+//TypeScript is correctly telling you that you’re trying to instantiate an abstract class.
+//After all, given the definition of greet, it’s perfectly legal to write this code, which would end up constructing an abstract class:
+//bad
+//greet(AbstractBase)
+
+//Instead, you want to write a function that accepts something with a construct signature:
+/*
+function greet(ctor: new () => AbstractBase) {
+  const instance = new ctor();
+  instance.printName();
+}
+greet(AbstractDerived); //<==error
+greet(AbstractBase); //<== error
+//Argument of type 'typeof Base' is not assignable to parameter of type 'new () => Base'.
+  //Cannot assign an abstract constructor type to a non-abstract constructor type.
+*/
+
+//Now TypeScript correctly tells you about which class constructor functions can be invoked - Derived can because it's concrete, but Base cannot
+
+//note Relationships Between Classes
+//In most cases, classes in TypeScript are compared structurally, the same as other types.
+
+//example, these two classes can be used in place of each other because they're identical:
+class Point1 {
+  x = 0;
+  y = 0;
+}
+
+class Point2 {
+  x = 0;
+  y = 0;
+}
+
+// OK
+const p: Point1 = new Point2();
+
+//Similarly, subtype relationships between classes exist even if there's no explicit inheritance:
+/*
+class Person {
+  name: string;
+  age: number;
+}
+
+class Employee {
+  name: string;
+  age: number;
+  salary: number;
+}
+
+// OK
+const p7: Person = new Employee();
+*/
+
+//This sounds straightforward, but there are a few cases that seem stranger than others.
+
+//Empty classes have no members. In a structural type system, a type with no members is generally a supertype of anything else. So if you write an empty class (don't!), anything can be used in place of it:
+//Example
+/*
+class Empty {}
+
+function fn(x: Empty) {
+  // can't do anything with 'x', so I won't
+}
+
+// All OK!
+fn(window);
+fn({});
+fn(fn);
+*/
