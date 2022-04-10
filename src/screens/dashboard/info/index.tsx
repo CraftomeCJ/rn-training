@@ -556,3 +556,177 @@ class MsgError extends Error {
 
 //Unfortunately, these workarounds will not work on Internet Explorer 10 and prior. One can manually copy methods from the prototype onto the instance itself (i.e. MsgError.prototype onto this), but the prototype chain itself cannot be fixed.
 
+//learn Member Visibility
+//You can use TypeScript to control whether certain methods or properties are visible to code outside the class.
+
+//note public: all
+//The default visibility of class members is public. A public member can be accessed anywhere:
+//example
+class Greeter {
+  public greet() {
+    console.log("Hello")
+  }
+}
+
+const nameForClass = new Greeter();
+nameForClass.greet();
+//Because public is already the default visibility modifier, you don’t ever need to write it on a class member, but might choose to do so for style/readability reasons.
+
+//note protected: sub-class
+//protected members are only visible to subclasses of the class they're declared in.
+class ProtectedGreeter {
+  public greet() {
+    console.log("Hello, " + this.getName());
+  }
+  protected getName() {
+    return "hi";
+  }
+}
+
+class SpecialGreeter extends ProtectedGreeter {
+  public howdy() {
+    // OK to access protected member here
+    console.log("Howdy, " + this.getName());
+  }
+}
+const g = new SpecialGreeter();
+g.greet(); // OK
+g.getName(); //<== error
+////Property 'getName' is protected and only accessible within class 'Greeter' and its subclasses.
+
+//note Exposure of protected members
+
+//Derived classes need to follow their base class contracts, but may choose to expose a subtype of base class with more capabilities. This includes making protected members public:
+class ProtectedBase {
+  protected m = 10;
+}
+class PublicDerived extends Base {
+  // No modifier, so default is 'public'
+  m = 15;
+}
+const d1 = new PublicDerived();
+console.log(d1.m); // OK
+
+//note that PublicDerived was already able to freely read and write m, so this doesn't meaningfully alter the "security" of this situation. The main thing to note here is that in the derived (sub)class, we need to be careful to repeat the protected modifier if this exposure isn't intentional.
+
+//note Cross-hierarchy protected access
+
+//Different OOP languages disagree about whether it’s legal to access a protected member through a base class reference:
+//example with error
+/*
+class CrossHierarchyBase {
+  protected x: number = 1;
+}
+class Derived1 extends CrossHierarchyBase {
+  protected x: number = 5;
+}
+class Derived2 extends CrossHierarchyBase {
+  f1(other: Derived2) {
+    other.x = 10;
+  }
+  f2(other: CrossHierarchyBase) {
+    other.x = 10; //<== error
+//Property 'x' is protected and only accessible through an instance of class 'Derived2'. This is an instance of class 'Base'.
+  }
+}
+*/
+/*
+Java, for example, considers this to be legal. On the other hand, C# and C++ chose that this code should be illegal.
+
+TypeScript sides with C# and C++ here, because accessing x in Derived2 should only be legal from Derived2's subclasses, and Derived1 isn't one of them. Moreover, if accessing x through a Derived1 reference is illegal (which it certainly should be!), then accessing it through a base class reference should never improve the situation.
+*/
+
+//note private: self only
+//private is like protected, but doesn't allow access to the member even from subclasses:
+//example with error
+/*
+class PrivateBase {
+  private x = 0;
+}
+const b = new Base();
+//can't access from the outside the class
+console.log(b,x); //<==error
+//Property 'x' is private and only accessible within class 'Base'.
+
+class Derived2 extends PrivateBase {
+showX() {
+  //can't access in subclasses
+  console.log(this.x); //<==error
+  //Property 'x' is private and only accessible within class 'Base'.
+}
+}
+
+//Because private members aren’t visible to derived classes, a derived class can’t increase its visibility:
+
+class PrivateBase1 {
+  private x = 0;
+}
+class Derived3 extends PrivateBase1 {
+//Class 'Derived' incorrectly extends base class 'Base'.
+  //Property 'x' is private in type 'Base' but not in type 'Derived'.
+  x = 1;
+}
+*/
+
+//note Cross-instance private access
+
+//Different OOP languages disagree about whether different instances of the same class may access each others' private members. While languages like Java, C#, C++, Swift, and PHP allow this, Ruby does not.
+
+//TypeScript does allow cross-instance private access:
+class A {
+  private x = 10;
+
+  public sameAs(other: A) {
+    //no error
+    return other.x === this.x
+  }
+}
+
+//note Caveats
+//Like other aspects of TypeScript's type system, private and protected are only enforced during type checking.
+
+//This means that JavaScript runtime constructs like in or simple property lookup can still access a private or protected member:
+class MySafe {
+  private secretKey = 12345;
+}
+// In a JavaScript file...
+const s = new MySafe();
+// Will print 12345
+//console.log(s.secretKey); //<== error
+//Property 'secretKey' is private and only accessible within class 'MySafe'.
+
+//private also allows access using bracket notation during type checking. This makes private-declared fields potentially easier to access for things like unit tests, with the drawback that these fields are soft private and don't strictly enforce privacy.
+// OK
+console.log(s["secretKey"]);
+
+//Unlike TypeScripts's private, JavaScript's private fields (#) remain private after compilation and do not provide the previously mentioned escape hatches like bracket notation access, making them hard private.
+//example TyprScript:
+class Doggy {
+  #barkAmount = 0;
+  personality = "happy";
+
+  constructor() {}
+}
+//example JavaScript
+// "use strict";
+// class Doggy {
+//     #barkAmount = 0;
+//     personality = "happy";
+//     constructor() { }
+// }
+
+//When compiling to ES2021 or less, TypeScript will use WeakMaps in place of #.
+/*
+"use strict";
+var _Dog_barkAmount;
+class Dog {
+    constructor() {
+        _Dog_barkAmount.set(this, 0);
+        this.personality = "happy";
+    }
+}
+_Dog_barkAmount = new WeakMap();
+*/
+
+//If you need to protect values in your class from malicious actors, you should use mechanisms that offer hard runtime privacy, such as closures, WeakMaps, or private fields.
+//note that these added privacy checks during runtime could affect performance.
