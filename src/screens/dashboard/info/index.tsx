@@ -803,7 +803,8 @@ const MyHelperObject = {
 //note static Blocks in Classes
 //Static blocks allow you to write a sequence of statements with their own scope that can access private fields within the containing class.
 //This means that we can write initialization code with all the capabilities of writing statements, no leakage of variables, and full access to our class's internals.
-
+//example
+/*
 class Foo {
     static #count = 0;
 
@@ -819,4 +820,125 @@ class Foo {
         catch {}
     }
 }
+*/
+
+//learn Generic Classes
+//Classes, much like interfaces, can be generic. When a generic class is instantiated with new, its type parameters are inferred the same way as in a function call:
+
+class Box<Type> {
+  contents: Type;
+
+  constructor(value: Type) {
+    this.contents = value;
+  }
+}
+
+const b = new Box("hello!");
+//const b: Box<string>  //<== result
+
+//Classes can use generic constraints and defaults the same way as interfaces.
+
+//note Type Parameters in Static Members
+
+//This code isn't legal, and it may not be obvious why:
+/*
+class Box<Type> {
+  static defaultValue: Type;  //<== error
+//Static members cannot reference class type parameters.
+}
+*/
+
+//Remember that types are always fully erased!
+//At runtime, there's only one Box.defaultValue property slot.
+//This means that setting Box<string>.defaultValue (if that were possible) would also change Box<number>.defaultValue - not good.
+//The static members of a generic class can never refer to the class's type parameters.
+
+//note this. at Runtime in Classes
+//It’s important to remember that TypeScript doesn’t change the runtime behavior of JavaScript, and that JavaScript is somewhat famous for having some peculiar runtime behaviors.
+
+//JavaScript’s handling of this is indeed unusual:
+class ThisMyClass {
+  name = "MyClass";
+
+  getName() {
+    return this.name;
+  }
+}
+
+const c = new ThisMyClass();
+
+const obj = {
+  name: "obj",
+  getName: c.getName,
+};
+
+// Prints "obj", not "MyClass"
+console.log(obj.getName());
+
+//Long story short, by default, the value of this inside a function depends on how the function was called.
+//In above example, because the function was called through the obj reference, its value of this was obj rather than the class instance.
+
+//This is rarely what you want to happen!
+//TypeScript provides some ways to mitigate or prevent this kind of error.
+
+//note Arrow Function
+//If you have a function that will often be called in a way that loses its this context, it can make sense to use an arrow function property instead of a method definition:
+class ArrowFuncClass {
+  name = "MyClass";
+
+  getName = () => {
+    return this.name;
+  };
+}
+const c1 = new ArrowFuncClass();
+const g1 = c1.getName;
+// Prints "MyClass" instead of crashing
+console.log(g1());
+
+//note This has some trade-offs:
+
+// The this. value is guaranteed to be correct at runtime, even for code not checked with TypeScript
+//This will use more memory, because each class instance will have its own copy of each function defined this way
+//You can't use super.getName in a derived class, because there's no entry in the prototype chain to fetch the base class method from
+
+//note this parameters
+/*
+//In a method or function definition, an initial parameter named this has special meaning in TypeScript. These parameters are erased during compilation:
+// TypeScript input with 'this' parameter
+function fn(this: SomeType, x: number) {
+ . . .
+}
+
+// JavaScript output
+function fn(x) {
+  . . .
+}
+*/
+
+//TypeScript checks that calling a function with a this parameter is done so with a correct context.
+//Instead of using an arrow function, we can add a this parameter to method definitions to statically enforce that the method is called correctly:
+//example
+
+class correctMyClass {
+  name = "MyTestClass";
+
+  getName(this: correctMyClass) {
+    return this.name;
+  }
+}
+const c5 = new correctMyClass();
+// OK
+c5.getName();
+/*
+// Error, would crash
+const g = c.getName;
+console.log(g());
+//The 'this' context of type 'void' is not assignable to method's 'this' of type 'MyClass'.
+*/
+
+//note This method makes the opposite trade-offs of the arrow function approach:
+
+//JavaScript callers might still use the class method incorrectly without realizing it
+// Only one function per class definition gets allocated, rather than one per class instance
+//Base method definitions can still be called via super.
 
