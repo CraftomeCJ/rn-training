@@ -225,3 +225,75 @@ squareTwo;
 //note CommonJS and ES Modules interop
 //There is a mis-match in features between CommonJS and ES Modules regarding the distinction between a default import and a module namespace object import.
 //TypeScript has a compiler flag to reduce the friction between the two different sets of constraints with esModuleInterop.
+
+
+//learn TypeScript's Module Resolution Options
+//Module resolution is the process of taking a string from the import or require statement, and determining what file that string refers to.
+
+//TypeScript includes two resolution strategies: Classic and Node.
+//=> Classic, the default when the compiler option module is not commonjs, is included for backwards compatibility.
+//=>The Node strategy replicates how Node.js works in CommonJS mode, with additional checks for .ts and .d.ts.
+
+//There are many TSConfig flags which influence the module strategy within TypeScript: moduleResolution, baseUrl, paths, rootDirs.
+
+//For the full details on how these strategies work, you can consult the Module Resolution.
+
+//learn TypeScript's Module Output Options
+/*
+There are two options which affect the emitted JavaScript output:
+
+//=> target which determines which JS features are downleveled (converted to run in older JavaScript runtimes) and which are left intact
+
+//=> module which determines what code is used for modules to interact with each other
+
+Which target you use is determined by the features available in the JavaScript runtime you expect to run the TypeScript code in.
+
+That could be: the oldest web browser you support, the lowest version of Node.js you expect to run on or could come from unique constraints from your runtime - like Electron for example.
+
+All communication between modules happens via a module loader, the compiler option module determines which one is used.
+
+At runtime the module loader is responsible for locating and executing all dependencies of a module before executing it.
+
+example, here is a TypeScript file using ES Modules syntax, showcasing a few different options for module:
+
+import { valueOfPi } from "./constants.js";
+export const twoPi = valueOfPi * 2;
+
+example ES2020
+
+import { valueOfPi } from "./constants.js";
+export const twoPi = valueOfPi * 2;
+
+
+example CommonJS
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.twoPi = void 0;
+const constants_js_1 = require("./constants.js");
+exports.twoPi = constants_js_1.valueOfPi * 2;
+
+
+example UMD
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "./constants.js"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.twoPi = void 0;
+    const constants_js_1 = require("./constants.js");
+    exports.twoPi = constants_js_1.valueOfPi * 2;
+});
+
+
+important Note that ES2020 is effectively the same as the original index.ts.
+
+You can see all of the available options and what their emitted JavaScript code looks like in the TSConfig Reference for module.
+*/
+
+
