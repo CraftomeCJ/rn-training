@@ -368,3 +368,343 @@ draw({ color: "red", raidus: 42 });
 //We just looked at two ways to combine types which are similar, but are actually subtly different. With interfaces, we could use an extends clause to extend from other types, and we were able to do something similar with intersections and name the result with a type alias. The principle difference between the two is how conflicts are handled, and that difference is typically one of the main reasons why you'd pick one over the other between an interface and a type alias of an intersection type.
 
 
+//learn Generic Object Types
+//Let's imagine a Box type that can contain any value - strings, numbers, Giraffes, whatever.
+/*
+interface Box {
+  contents: any;
+}
+*/
+
+//Right now, the contents property is typed as any, which works, but can lead to accidents down the line.
+
+//We could instead use unknown, but that would mean that in cases where we already know the type of contents, we'd need to do precautionary checks, or use error-prone type assertions.
+interface UnknownBox {
+  contents: unknown;
+}
+
+let x: UnknownBox = {
+  contents: "hello world",
+};
+
+// we could check 'x.contents'
+if (typeof x.contents === "string") {
+  console.log(x.contents.toLowerCase());
+}
+
+// or we could use a type assertion
+console.log((x.contents as string).toLowerCase());
+
+//note One type safe approach would be to instead scaffold out different Box types for every type of contents.
+
+interface NumberBox {
+  contents: number;
+}
+
+interface StringBox {
+  contents: string;
+}
+
+interface BooleanBox {
+  contents: boolean;
+}
+
+//But that means we'll have to create different functions, or overloads of functions, to operate on these types.
+
+function setContents(box: StringBox, newContents: string): void;
+function setContents(box: NumberBox, newContents: number): void;
+function setContents(box: BooleanBox, newContents: boolean): void;
+function setContents(box: { contents: any }, newContents: any) {
+  box.contents = newContents;
+}
+
+//That's a lot of boilerplate. Moreover, we might later need to introduce new types and overloads. This is frustrating, since our box types and overloads are all effectively the same.
+
+//Instead, we can make a generic Box type which declares a type parameter.
+interface GenericBox<Type> {
+  contents: Type;
+}
+//You might read this as "A Box of Type is something whose contents have type Type". Later on, when we refer to Box, we have to give a type argument in place of Type.
+
+let box: GenericBox<string>;
+
+//Think of Box as a template for a real type, where Type is a placeholder that will get replaced with some other type. When TypeScript sees Box<string>, it will replace every instance of Type in Box<Type> with string, and end up working with something like { contents: string }. In other words, Box<string> and our earlier StringBox work identically.
+
+interface GenericBox<Type> {
+  contents: Type;
+}
+interface StringBox {
+  contents: string;
+}
+
+let boxA: GenericBox<string> = { contents: "hello" };
+boxA.contents;
+//(property) Box<string>.contents: string
+
+let boxB: StringBox = { contents: "world" };
+boxB.contents;
+//(property) StringBox.contents: string
+
+//Box is reusable in that Type can be substituted with anything. That means that when we need a box for a new type, we don't need to declare a new Box type at all (though we certainly could if we wanted to).
+
+interface ReusableBox<Type> {
+  contents: Type;
+}
+
+interface Apple {
+  // ....
+}
+
+// Same as '{ contents: Apple }'.
+type AppleBox = Box<Apple>;
+
+//This also means that we can avoid overloads entirely by instead using generic functions.
+
+function setContents1<Type>(box: Box<Type>, newContents: Type) {
+  box.contents = newContents;
+}
+
+//It is worth noting that type aliases can also be generic. We could have defined our new Box<Type> interface, which was:
+interface AliasesBox<Type> {
+  contents: Type;
+}
+
+//by using a type alias instead:
+type AsBox<Type> = {
+  contents: Type;
+};
+
+//Since type aliases, unlike interfaces, can describe more than just object types, we can also use them to write other kinds of generic helper types.
+
+type OrNull<Type> = Type | null;
+
+type OneOrMany<Type> = Type | Type[];
+
+type OneOrManyOrNull<Type> = OrNull<OneOrMany<Type>>;
+      //type OneOrManyOrNull<Type> = OneOrMany<Type> | null
+
+type OneOrManyOrNullStrings = OneOrManyOrNull<string>;
+    //type OneOrManyOrNullStrings = OneOrMany<string> | null
+
+//We'll circle back to type aliases in just a little bit.
+
+//note The Array Type
+//Generic object types are often some sort of container type that work independently of the type of elements they contain. It's ideal for data structures to work this way so that they're re-usable across different data types.
+
+//It turns out we've been working with a type just like that throughout this handbook: the Array type. Whenever we write out types like number[] or string[], that's really just a shorthand for Array<number> and Array<string>.
+function doSomething(value: Array<string>) {
+  // ...
+}
+
+let myArray: string[] = ["hello", "world"];
+
+// either of these work!
+doSomething(myArray);
+doSomething(new Array("hello", "world"));
+
+//Much like the Box type above, Array itself is a generic type.
+interface Array<Type> {
+  /**
+   * Gets or sets the length of the array.
+   */
+  length: number;
+
+  /**
+   * Removes the last element from an array and returns it.
+   */
+  pop(): Type | undefined;
+
+  /**
+   * Appends new elements to an array, and returns the new length of the array.
+   */
+  push(...items: Type[]): number;
+
+  // ...
+}
+//Modern JavaScript also provides other data structures which are generic, like Map<K, V>, Set<T>, and Promise<T>. All this really means is that because of how Map, Set, and Promise behave, they can work with any sets of types.
+
+//note The ReadonlyArray Type
+//The ReadonlyArray is a special type that describes arrays that shouldn't be changed.
+/*
+function doStuff(values: ReadonlyArray<string>) {
+  // We can read from 'values'...
+  const copy = values.slice();
+  console.log(`The first value is ${values[0]}`);
+
+  // ...but we can't mutate 'values'.
+  values.push("hello!");
+//Property 'push' does not exist on type 'readonly string[]'.
+}
+*/
+
+//Much like the readonly modifier for properties, it’s mainly a tool we can use for intent. When we see a function that returns ReadonlyArrays, it tells us we’re not meant to change the contents at all, and when we see a function that consumes ReadonlyArrays, it tells us that we can pass any array into that function without worrying that it will change its contents.
+
+//Unlike Array, there isn’t a ReadonlyArray constructor that we can use.
+/*
+new ReadonlyArray("red", "green", "blue");
+     //'ReadonlyArray' only refers to a type, but is being used as a value here.
+*/
+
+//Instead, we can assign regular Arrays to ReadonlyArrays.
+
+const roArray: ReadonlyArray<string> = ["red", "green", "blue"];
+
+//Just as TypeScript provides a shorthand syntax for Array<Type> with Type[], it also provides a shorthand syntax for ReadonlyArray<Type> with readonly Type[].
+/*
+function doStuff(values: readonly string[]) {
+  // We can read from 'values'...
+  const copy = values.slice();
+  console.log(`The first value is ${values[0]}`);
+
+  // ...but we can't mutate 'values'.
+  values.push("hello!");
+//Property 'push' does not exist on type 'readonly string[]'.
+}
+*/
+
+//One last thing to note is that unlike the readonly property modifier, assignability isn’t bidirectional between regular Arrays and ReadonlyArrays.
+/*
+let x9: readonly string[] = [];
+let y9: string[] = [];
+
+x9= y;
+y9 = x;
+//The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+*/
+
+//note Tuple Types
+//A tuple type is another sort of Array type that knows exactly how many elements it contains, and exactly which types it contains at specific positions.
+
+type StringNumberPair = [string, number];
+
+//Here, StringNumberPair is a tuple type of string and number. Like ReadonlyArray, it has no representation at runtime, but is significant to TypeScript. To the type system, StringNumberPair describes arrays whose 0 index contains a string and whose 1 index contains a number.
+
+function doSomething1(pair: [string, number]) {
+  const a10 = pair[0];
+//const a10: string
+
+  const b10 = pair[1];
+//const b10: number
+
+// ...
+}
+
+doSomething1(["hello", 42]);
+
+/*
+//If we try to index past the number of elements, we’ll get an error.
+
+function doSomething(pair: [string, number]) {
+  // ...
+
+  const c = pair[2];
+//Tuple type '[string, number]' of length '2' has no element at index '2'.
+}
+*/
+
+//We can also destructure tuples using JavaScript's array destructuring.
+
+function doSomething2(stringHash: [string, number]) {
+  const [inputString, hash] = stringHash;
+
+  console.log(inputString);
+//const inputString: string
+
+  console.log(hash);
+//const hash: number
+}
+
+//important Tuple types are useful in heavily convention-based APIs, where each element's meaning is "obvious". This gives us flexibility in whatever we want to name our variables when we destructure them. In the above example, we were able to name elements 0 and 1 to whatever we wanted.
+
+//However, since not every user holds the same view of what's obvious, it may be worth reconsidering whether using objects with descriptive property names may be better for your API.
+
+//Other than those length checks, simple tuple types like these are equivalent to types which are versions of Arrays that declare properties for specific indexes, and that declare length with a numeric literal type.
+
+interface StringNumberPair1 {
+  // specialized properties
+  length: 2;
+  0: string;
+  1: number;
+
+  // Other 'Array<string | number>' members...
+  slice(start?: number, end?: number): Array<string | number>;
+}
+
+//Another thing you may be interested in is that tuples can have optional properties by writing out a question mark (? after an element's type).
+//Optional tuple elements can only come at the end, and also affect the type of length.
+
+type Either2dOr3d = [number, number, number?];
+
+function setCoordinate(coord: Either2dOr3d) {
+  const [x, y, z] = coord;
+  //const z: number | undefined
+
+  console.log(`Provided coordinates had ${coord.length} dimensions`);
+//(property) length: 2 | 3
+}
+
+//note Tuples can also have rest elements, which have to be an array/tuple type.
+
+type StringNumberBooleans = [string, number, ...boolean[]];
+type StringBooleansNumber = [string, ...boolean[], number];
+type BooleansStringNumber = [...boolean[], string, number];
+
+//=>StringNumberBooleans describes a tuple whose first two elements are string and number respectively, but which may have any number of booleans following.
+
+//=>StringBooleansNumber describes a tuple whose first element is string and then any number of booleans and ending with a number.
+
+//=>BooleansStringNumber describes a tuple whose starting elements are any number of booleans and ending with a string then a number.
+
+//A tuple with a rest element has no set “length” - it only has a set of well-known elements in different positions.
+
+const a: StringNumberBooleans = ["hello", 1];
+const b: StringNumberBooleans = ["beautiful", 2, true];
+const c: StringNumberBooleans = ["world", 3, true, false, true, false, true];
+
+//Why might optional and rest elements be useful? Well, it allows TypeScript to correspond tuples with parameter lists. Tuples types can be used in rest parameters and arguments, so that the following:
+
+function readButtonInput(...args: [string, number, ...boolean[]]) {
+  const [name, version, ...input] = args;
+  // ...
+}
+
+//is basically equivalent to:
+
+function readButtonInputToo(name: string, version: number, ...input: boolean[]) {
+  // ...
+}
+
+//This is handy when you want to take a variable number of arguments with a rest parameter, and you need a minimum number of elements, but you don't want to introduce intermediate variables.
+
+//note readonly Tuple Types
+//One final note about tuple types - tuples types have readonly variants, and can be specified by sticking a readonly modifier in front of them - just like with array shorthand syntax.
+
+function doSomethinglo(pair: readonly [string, number]) {
+  // ...
+}
+
+/*
+//As you might expect, writing to any property of a readonly tuple isn’t allowed in TypeScript.
+
+function doSomething(pair: readonly [string, number]) {
+  pair[0] = "hello!";
+//Cannot assign to '0' because it is a read-only property.
+}
+*/
+
+/*
+//Tuples tend to be created and left un-modified in most code, so annotating types as readonly tuples when possible is a good default. This is also important given that array literals with const assertions will be inferred with readonly tuple types.
+
+let point = [3, 4] as const;
+
+function distanceFromOrigin([x, y]: [number, number]) {
+  return Math.sqrt(x ** 2 + y ** 2);
+}
+
+distanceFromOrigin(point);
+//Argument of type 'readonly [3, 4]' is not assignable to parameter of type '[number, number]'.
+  //The type 'readonly [3, 4]' is 'readonly' and cannot be assigned to the mutable type '[number, number]'.
+*/
+
+  //Here, distanceFromOrigin never modifies its elements, but expects a mutable tuple.
+  //Since point's type was inferred as readonly [3, 4], it won't be compatible with [number, number] since that type can't guarantee point's elements won't be mutated.
