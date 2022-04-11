@@ -191,3 +191,37 @@ const code = fs.readFileSync("hello.ts", "utf8");
 //You can learn more about this syntax in the modules reference page.
 */
 
+
+//learn CommonJS Syntax
+//CommonJS is the format which most modules on npm are delivered in. Even if you are writing using the ES Modules syntax above, having a brief understanding of how CommonJS syntax works will help you debug easier.
+
+//note Exporting
+
+//Identifiers are exported via setting the exports property on a global called module.
+
+function absolutely(num: number) {
+  if (num < 0) return num * -1;
+  return num;
+}
+
+module.exports = {
+  pi: 3.14,
+  squareTwo: 1.41,
+  phi: 1.61,
+  absolutely,
+};
+
+//Then these files can be imported via a require statement:
+const maths = require("maths");
+maths.pi;
+      //any
+
+//Or you can simplify a bit using the destructuring feature in JavaScript:
+
+const { squareTwo } = require("maths");
+squareTwo;
+    //const squareTwo: any
+
+//note CommonJS and ES Modules interop
+//There is a mis-match in features between CommonJS and ES Modules regarding the distinction between a default import and a module namespace object import.
+//TypeScript has a compiler flag to reduce the friction between the two different sets of constraints with esModuleInterop.
